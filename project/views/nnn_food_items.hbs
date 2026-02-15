@@ -82,7 +82,11 @@
     </select>
 
     <label for='update_food_item_price'>Price: </label>
-    <input type='number' name='update_food_item_price' id='update_food_item_price' min='0' />
+
+    <!-- Citation for the step field in the following control. Date: 2/15/2026
+         Developed with reference to:
+         Source URL: https://amydegregorio.com/2017/11/22/html5-number-input-the-step-attribute/ -->
+    <input type='number' step=".01" name='update_food_item_price' id='update_food_item_price' min='0' />
 
     <input type='submit' />
 </form>

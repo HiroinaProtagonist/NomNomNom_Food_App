@@ -1,5 +1,6 @@
 // ########################################
 // ########## SETUP
+require('dotenv').config();
 
 // Express
 const express = require('express');
@@ -11,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const PORT = 5001;
+const PORT = 9155;
 
 // Database
 const db = require('./database/db-connector');
