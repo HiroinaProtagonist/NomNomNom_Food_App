@@ -1,4 +1,4 @@
-<h1>NNN Orders</h1>
+<h1>Orders</h1>
 
 {{! READ table }}
 <table>
@@ -18,13 +18,13 @@
         {{! For each row, print the id, fname, lname, homeworld and age }}
         {{#each order}}
         <tr>
-            <td>{{this.ORDER_ID}}</td>
-            <td>{{this.ORDER_DATE}}</td>
-            <td>{{this.CUSTOMER_NAME}}</td>
-            <td>{{this.RESTAURANT_NAME}}</td>
-            <td>{{this.FOOD_NAME}}</td>
-            <td>{{this.ITEM_PRICE}}</td>
-            <td>{{this.ORDER_TOTAL_PRICE}}</td>
+            <td>{{this.ID}}</td>
+            <td>{{this.DATE}}</td>
+            <td>{{this.CUSTOMER}}</td>
+            <td>{{this.RESTAURANT}}</td>
+            <td>{{this.FOOD}}</td>
+            <td>{{this.PRICE}}</td>
+            <td>{{this.TOTAL}}</td>
 
             {{! DELETE form }}
             <form id='delete_person_form'>
@@ -44,7 +44,7 @@
 {{!-- Removed CREATE, do not need for M:M and already have on Food Items page --}}
 
 {{! UPDATE form }}
-<h2>Update an Orders Details</h2>
+<h2>Update an Order's Details</h2>
 <form class='cuForm' id='update_order_id_form'>
     <label for='update_order_id'>Order Number to Update: </label>
     <select name='update_order_id' id='update_order_id' required>

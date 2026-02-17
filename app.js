@@ -36,7 +36,7 @@ app.get('/', async function (req, res) {
     }
 });
 
-app.get('/nnn_food_items', async function (req, res) {
+app.get('/food_items', async function (req, res) {
     try {
         // Create and execute our queries
         const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'food_items.sql'), 'utf8');
@@ -50,7 +50,7 @@ app.get('/nnn_food_items', async function (req, res) {
 
         // Render the food_items.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('nnn_food_items', {food: food, restaurant: restaurant, foods: foods});
+        res.render('food_items', {food: food, restaurant: restaurant, foods: foods});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -60,7 +60,7 @@ app.get('/nnn_food_items', async function (req, res) {
     }
 });
 
-app.get('/nnn_restaurants', async function (req, res) {
+app.get('/restaurants', async function (req, res) {
     try {
         // Create and execute our queries
         const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'restaurants.sql'), 'utf8');
@@ -68,7 +68,7 @@ app.get('/nnn_restaurants', async function (req, res) {
 
         // Render the restaurants.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('nnn_restaurants', { restaurant: restaurant});
+        res.render('restaurants', { restaurant: restaurant});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -78,7 +78,7 @@ app.get('/nnn_restaurants', async function (req, res) {
     }
 });
 
-app.get('/nnn_customers', async function (req, res) {
+app.get('/customers', async function (req, res) {
     try {
         // Create and execute our queries
         const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'customers.sql'), 'utf8');
@@ -86,7 +86,7 @@ app.get('/nnn_customers', async function (req, res) {
 
         // Render the customers.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('nnn_customers', { customer: customer});
+        res.render('customers', { customer: customer});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -96,7 +96,7 @@ app.get('/nnn_customers', async function (req, res) {
     }
 });
 
-app.get('/nnn_food_items_orders', async function (req, res) {
+app.get('/food_items_orders', async function (req, res) {
     try {
         // Create and execute our queries
 
@@ -115,7 +115,7 @@ app.get('/nnn_food_items_orders', async function (req, res) {
 
         // Render the food_items_orders.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('nnn_food_items_orders', { order: order, orders: orders});
+        res.render('food_items_orders', { order: order, orders: orders});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
