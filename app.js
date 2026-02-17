@@ -39,16 +39,16 @@ app.get('/', async function (req, res) {
 app.get('/nnn_food_items', async function (req, res) {
     try {
         // Create and execute our queries
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_food_items.sql'), 'utf8');
+        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'food_items.sql'), 'utf8');
         const [food] = await db.query(query1);
 
-        const query2 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_food_items-restaurant_list.sql'), 'utf8');
+        const query2 = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_restaurant_list.sql'), 'utf8');
         const [restaurant] = await db.query(query2);
 
-        const query3 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_food_items-list.sql'), 'utf8');
+        const query3 = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_list.sql'), 'utf8');
         const [foods] = await db.query(query3);
 
-        // Render the nnn_food_items.hbs file, and also send the renderer
+        // Render the food_items.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('nnn_food_items', {food: food, restaurant: restaurant, foods: foods});
     } catch (error) {
@@ -63,10 +63,10 @@ app.get('/nnn_food_items', async function (req, res) {
 app.get('/nnn_restaurants', async function (req, res) {
     try {
         // Create and execute our queries
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_restaurants.sql'), 'utf8');
+        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'restaurants.sql'), 'utf8');
         const [restaurant] = await db.query(query1);
 
-        // Render the nnn_restaurants.hbs file, and also send the renderer
+        // Render the restaurants.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('nnn_restaurants', { restaurant: restaurant});
     } catch (error) {
@@ -81,10 +81,10 @@ app.get('/nnn_restaurants', async function (req, res) {
 app.get('/nnn_customers', async function (req, res) {
     try {
         // Create and execute our queries
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_customers.sql'), 'utf8');
+        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'customers.sql'), 'utf8');
         const [customer] = await db.query(query1);
 
-        // Render the nnn_customers.hbs file, and also send the renderer
+        // Render the customers.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('nnn_customers', { customer: customer});
     } catch (error) {
@@ -107,13 +107,13 @@ app.get('/nnn_food_items_orders', async function (req, res) {
            in this .get() block, but maybe that's for a seperate .get() block? Like would we have one .get() to catch a click on a DELETE
            button on this page or would we keep it in here? Same question for CREATE and UPDATE.
         */
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_food_items_orders.sql'), 'utf8');
+        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_orders.sql'), 'utf8');
         const [order] = await db.query(query1);
 
-        const query2 = fs.readFileSync(path.join(__dirname, 'queries', 'nnn_orders.sql'), 'utf8');
+        const query2 = fs.readFileSync(path.join(__dirname, 'queries', 'orders.sql'), 'utf8');
         const [orders] = await db.query(query2);
 
-        // Render the nnn_food_items_orders.hbs file, and also send the renderer
+        // Render the food_items_orders.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('nnn_food_items_orders', { order: order, orders: orders});
     } catch (error) {
