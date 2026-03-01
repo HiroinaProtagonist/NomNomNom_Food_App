@@ -59,6 +59,7 @@
     <label for='update_food_item_id'>Food Item to Update: </label>
     <select name='update_food_item_id' id='update_food_item_id'>
         <option value='' disabled selected>Food Item</option>
+        <!-- Should be distinct values - ie Ribs only once?-->
         {{#each orders}}
         <option value='{{this.FOOD_ITEM_ID}}' required>
             {{this.NAME}}

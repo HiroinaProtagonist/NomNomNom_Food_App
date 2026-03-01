@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const PORT = 9155;
+const PORT = 9177;
 
 // Database
 const db = require('./database/db-connector');
@@ -122,6 +122,30 @@ app.get('/food_items_orders', async function (req, res) {
         res.status(500).send(
             'An error occurred while executing the database queries.'
         );
+    }
+});
+
+// #####################  DELETE REQUEST TO DEMO RESET  #############################
+app.get('/demo-reset', async function(req, res) {
+    try {
+        const query_sp_delete = 'CALL sp_delete_french_fries;';
+        await db.query(query_sp_delete);
+        console.log("Demo successful")
+    } catch (error) {
+        console.error("Error in PL/SQL execution: ", error);
+        res.status(500).send('An error occurred while executing the database queries.');
+    }
+});
+
+// #####################  DELETE REQUEST TO DEMO RESET  #############################
+app.get('/reset', async function(req, res) {
+    try {
+        const query_sp_ddl = 'CALL sp_ddl;';
+        await db.query(query_sp_ddl);
+        console.log("Reset successful")
+    } catch (error) {
+        console.error("Error in PL/SQL execution: ", error);
+        res.status(500).send('An error occurred while executing the database queries.');
     }
 });
 
