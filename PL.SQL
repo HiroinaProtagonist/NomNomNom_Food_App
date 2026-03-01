@@ -1,3 +1,10 @@
+-- Citation for the following code:
+-- Date: 3/1/2026
+-- Adapted from PL/SQL assignment starter code and Step 4 Draft starter code
+-- (https://canvas.oregonstate.edu/courses/2031764/assignments/10323329?module_item_id=26243433,
+-- https://canvas.oregonstate.edu/courses/2031764/assignments/10323339?module_item_id=26243440)
+-- Changes made beyond the starter code are our own without reference to AI
+
 -- CALL DDL STATEMENTS TO RESET TABLES AND DATA
 DROP PROCEDURE IF EXISTS sp_ddl;
 DELIMITER //
