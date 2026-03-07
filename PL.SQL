@@ -125,9 +125,7 @@ BEGIN
 END //
 DELIMITER ;
 
-
-
---To demonstrate RESET
+-- To demonstrate RESET
 DROP PROCEDURE IF EXISTS sp_delete_french_fries;
 DELIMITER //
 CREATE PROCEDURE sp_delete_french_fries()
@@ -151,3 +149,124 @@ BEGIN
     SELECT 'Delete of food item successful' AS Result;
 END //
 DELIMITER ;
+
+-- FOOD_ITEMS CUD operations
+-- To create/insert into the FOOD_ITEMS table
+DROP PROCEDURE IF EXISTS sp_create_food_item;
+DELIMITER //
+CREATE PROCEDURE sp_create_food_item(
+    IN in_restaurant_id INT,
+    IN in_food_item_name VARCHAR(255),
+    IN in_price DECIMAL(6,2),
+    OUT out_food_item_id INT)
+BEGIN
+    INSERT INTO FOOD_ITEMS (RESTAURANT_ID, NAME, PRICE)
+    VALUES (in_restaurant_id, in_food_item_name, in_price);
+
+    -- Store the ID of the last inserted row
+    SELECT LAST_INSERT_ID() into out_food_item_id;
+
+    -- Display the ID of the last inserted person.
+    SELECT LAST_INSERT_ID() AS 'New food item inserted: ';
+END //
+DELIMITER ;
+
+-- To update from the FOOD_ITEMS table
+DROP PROCEDURE IF EXISTS sp_update_food_item;
+DELIMITER //
+CREATE PROCEDURE sp_update_food_item(
+    IN in_restaurant_id INT,
+    IN in_food_item_id INT,
+    IN in_food_item_name VARCHAR(255),
+    IN in_price DECIMAL(6,2))
+BEGIN
+    UPDATE FOOD_ITEMS SET RESTAURANT_ID=in_restaurant_id, FOOD_ITEM_ID=in_food_item_id,
+    NAME=in_food_item_name, PRICE=in_price WHERE FOOD_ITEM_ID=in_food_item_id
+    AND RESTAURANT_ID=in_restaurant_id;
+END //
+DELIMITER ;
+
+-- To delete from the FOOD_ITEMS table
+DROP PROCEDURE IF EXISTS sp_delete_food_item;
+DELIMITER //
+CREATE PROCEDURE sp_delete_food_item(
+    IN in_food_item_id INT)
+BEGIN
+    DECLARE error_message VARCHAR(255);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+            -- Rollback if failure in any statement and show failure message
+        ROLLBACK;
+        SELECT 'Error. Rollback triggered.' AS Result;
+    END;
+
+    -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
+    START TRANSACTION;
+        DELETE FROM ORDERS
+            LEFT JOIN FOOD_ITEMS_ORDERS ON FOOD_ITEMS_ORDERS.ORDER_ID = ORDERS.ORDER_ID
+            WHERE FOOD_ITEMS_ORDERS.FOOD_ITEM_ID = :FOOD_ITEM_ID_FROM_FORM;
+
+        -- ROW_COUNT() returns the number of rows affected by the preceding statement.
+        IF ROW_COUNT() = 0 THEN
+            set error_message = CONCAT('No matching record found in FOOD_ITEMS table for id: ', in_food_item_id);
+            -- Trigger custom error, invoke EXIT HANDLER
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
+        END IF;
+
+    -- Commit transaction and show success message
+    COMMIT;
+    SELECT 'Delete of food item successful' AS Result;
+END //
+DELIMITER ;
+
+-- FOOD_ITEMS_ORDERS CUD operations
+-- TODO Use logic to choose the correct update statement depending on whether both or either field is populated
+
+-- To update from the FOOD_ITEMS_ORDERS table by FOOD_ITEM_ID
+DROP PROCEDURE IF EXISTS sp_update_food_item_order_record;
+DELIMITER //
+CREATE PROCEDURE sp_update_food_item_order_record(
+    IN in_food_item_id INT,
+    IN in_order_id INT)
+BEGIN
+    UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id, ORDER_ID=in_order_id
+        WHERE FOOD_ITEM_ID=in_food_item_id;
+END //
+DELIMITER ;
+
+-- To delete from the FOOD_ITEMS table by food_item_id
+DROP PROCEDURE IF EXISTS sp_delete_food_item_order_record;
+DELIMITER //
+CREATE PROCEDURE sp_delete_food_item_order_record(
+    IN in_food_item_id INT,
+    IN in_order_id INT
+)
+BEGIN
+    DECLARE error_message VARCHAR(255);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        -- Rollback if failure in any statement and show failure message
+        ROLLBACK;
+        SELECT 'Error. Rollback triggered.' AS Result;
+    END;
+
+    -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
+    START TRANSACTION;
+        -- Get item to delete and execute deletes
+        DELETE FROM `FOOD_ITEMS_ORDERS` WHERE `FOOD_ITEM_ID` = food_item_id AND `ORDER_ID` = order_id;
+
+        -- ROW_COUNT() returns the number of rows affected by the preceding statement.
+        IF ROW_COUNT() = 0 THEN
+            SET error_message = CONCAT(
+                'No matching record found in FOOD_ITEMS_ORDERS for given FOOD_ITEM_ID: ',
+                in_food_item_id);
+            -- Trigger custom error, invoke EXIT HANDLER
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
+        END IF;
+
+    -- Commit transaction and show success message
+    COMMIT;
+    SELECT 'Delete of food item successful' AS Result;
+END //
+DELIMITER ;
+
