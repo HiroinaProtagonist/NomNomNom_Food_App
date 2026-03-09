@@ -15,7 +15,6 @@
                 {{@key}}
             </th>
             {{/each}}
-            <th></th>
         </tr>
     </thead>
 
@@ -23,24 +22,13 @@
         {{! For each row, print the id, fname, lname, homeworld and age }}
         {{#each order}}
         <tr>
-            <td>{{this.ID}}</td>
+            <td>{{this.NUMBER}}</td>
             <td>{{this.DATE}}</td>
             <td>{{this.CUSTOMER}}</td>
             <td>{{this.RESTAURANT}}</td>
             <td>{{this.FOOD}}</td>
             <td>{{this.PRICE}}</td>
             <td>{{this.TOTAL}}</td>
-
-            {{! DELETE form }}
-            <form id='delete_person_form'>
-                <input type='hidden' name='delete_person_id' value='{{this.id}}' />
-                <input type='hidden' name='delete_person_name' value='{{this.fname}} {{this.lname}}' />
-                <td>
-                    <button type='submit'>
-                        Delete
-                    </button>
-                </td>
-            </form>
         </tr>
         {{/each}}
     </tbody>
@@ -49,9 +37,10 @@
 {{!-- Removed CREATE, do not need for M:M and already have on Food Items page --}}
 
 {{! UPDATE form }}
+</br>
 <h2>Update an Order's Details</h2>
-<form class='cuForm' id='update_order_id_form'>
-    <label for='update_order_id'>Order Number to Update: </label>
+<form class='cuForm' id='update_order_id_form' method='POST' action='/food_items_orders/update'>
+    <label for='update_order_id'>Order to Update: </label>
     <select name='update_order_id' id='update_order_id' required>
         <option value='' disabled selected>Order Number</option>
         {{#each orders}}
@@ -65,20 +54,15 @@
     <select name='update_food_item_id' id='update_food_item_id'>
         <option value='' disabled selected>Food Item</option>
         <!-- Should be distinct values - ie Ribs only once?-->
-        {{#each orders}}
+        {{#each foods}}
         <option value='{{this.FOOD_ITEM_ID}}' required>
             {{this.NAME}}
         </option>
         {{/each}}
     </select>
 
-    {{!-- In order to be able to update something for the M:M we have, maybe we should add a field to be updated
-            our primary key in the intersection table is the order id plus the food item id, so would need
-            something else to update as we wouldn't be updating a PK, but rather other attributes.
-            Maybe you can add this to our DDL, and update the Step 3 draft to include this change?
-     --}}
     <label for='update_order_food_item_quantity'>Quantity: </label>
-    <input type='number' name='update_order_food_item_quantity' id='update_order_food_item_quantity' min='0' />
+    <input type='number' name='update_quantity' id='update_quantity' min='1' />
 
     <input type='submit' />
 </form>
