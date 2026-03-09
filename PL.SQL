@@ -175,22 +175,26 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_update_food_item;
 DELIMITER //
 CREATE PROCEDURE sp_update_food_item(
+    IN in_food_item_id_to_change INT,
+    IN in_restaurant_id_to_change INT,
     IN in_restaurant_id INT,
-    IN in_food_item_id INT,
     IN in_food_item_name VARCHAR(255),
     IN in_price DECIMAL(6,2))
 BEGIN
-    UPDATE FOOD_ITEMS SET RESTAURANT_ID=in_restaurant_id, FOOD_ITEM_ID=in_food_item_id,
-    NAME=in_food_item_name, PRICE=in_price WHERE FOOD_ITEM_ID=in_food_item_id
-    AND RESTAURANT_ID=in_restaurant_id;
+    UPDATE FOOD_ITEMS AS FI
+    LEFT JOIN RESTAURANTS AS R ON FI.RESTAURANT_ID = R.RESTAURANT_ID
+    SET FI.RESTAURANT_ID=in_restaurant_id, FI.NAME=in_food_item_name, FI.PRICE=in_price
+    WHERE FI.FOOD_ITEM_ID=in_food_item_id_to_change AND R.RESTAURANT_ID=in_restaurant_id_to_change;
+
+    -- If any orders include this food item, update them
+    UPDATE
 END //
 DELIMITER ;
 
 -- To delete from the FOOD_ITEMS table
 DROP PROCEDURE IF EXISTS sp_delete_food_item;
 DELIMITER //
-CREATE PROCEDURE sp_delete_food_item(
-    IN in_food_item_id INT)
+CREATE PROCEDURE sp_delete_food_item(IN in_food_item_id INT)
 BEGIN
     DECLARE error_message VARCHAR(255);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -202,9 +206,15 @@ BEGIN
 
     -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
     START TRANSACTION;
-        DELETE FROM ORDERS
+        -- Get item to delete and execute deletes
+        -- Citation for the syntax for the DELETE with JOIN. Date: 3/7/2026
+        -- Developed with reference to:
+        -- Source URL: https://stackoverflow.com/questions/2763206/deleting-rows-with-mysql-left-join
+        DELETE `ORDERS` FROM ORDERS
             LEFT JOIN FOOD_ITEMS_ORDERS ON FOOD_ITEMS_ORDERS.ORDER_ID = ORDERS.ORDER_ID
-            WHERE FOOD_ITEMS_ORDERS.FOOD_ITEM_ID = :FOOD_ITEM_ID_FROM_FORM;
+            WHERE FOOD_ITEMS_ORDERS.FOOD_ITEM_ID = in_food_item_id;
+
+        DELETE FROM `FOOD_ITEMS` WHERE FOOD_ITEM_ID = in_food_item_id;
 
         -- ROW_COUNT() returns the number of rows affected by the preceding statement.
         IF ROW_COUNT() = 0 THEN
@@ -222,17 +232,17 @@ DELIMITER ;
 -- FOOD_ITEMS_ORDERS CUD operations
 -- TODO Use logic to choose the correct update statement depending on whether both or either field is populated
 
--- To update from the FOOD_ITEMS_ORDERS table by FOOD_ITEM_ID
-DROP PROCEDURE IF EXISTS sp_update_food_item_order_record;
-DELIMITER //
-CREATE PROCEDURE sp_update_food_item_order_record(
-    IN in_food_item_id INT,
-    IN in_order_id INT)
-BEGIN
-    UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id, ORDER_ID=in_order_id
-        WHERE FOOD_ITEM_ID=in_food_item_id;
-END //
-DELIMITER ;
+-- -- To update from the FOOD_ITEMS_ORDERS table by FOOD_ITEM_ID
+-- DROP PROCEDURE IF EXISTS sp_update_food_item_order_record;
+-- DELIMITER //
+-- CREATE PROCEDURE sp_update_food_item_order_record(
+--     IN in_food_item_id INT,
+--     IN in_order_id INT)
+-- BEGIN
+--     UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id, ORDER_ID=in_order_id
+--         WHERE FOOD_ITEM_ID=in_food_item_id;
+-- END //
+-- DELIMITER ;
 
 -- To delete from the FOOD_ITEMS table by food_item_id
 DROP PROCEDURE IF EXISTS sp_delete_food_item_order_record;
@@ -270,3 +280,21 @@ BEGIN
 END //
 DELIMITER ;
 
+-- To get
+
+-- To update from the FOOD_ITEMS_ORDERS table
+DROP PROCEDURE IF EXISTS sp_update_food_order_item;
+DELIMITER //
+CREATE PROCEDURE sp_update_food_order_item(
+    IN in_order_id INT,
+    IN in_food_item_id INT,
+    IN in_quantity INT)
+BEGIN
+    UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id
+    WHERE ORDER_ID=in_order_id;
+
+    UPDATE ORDERS SET TOTAL_PRICE=(in_quantity *
+        (SELECT PRICE FROM FOOD_ITEMS WHERE FOOD_ITEM_ID=in_food_item_id))
+    WHERE ORDER_ID=in_order_id;
+END //
+DELIMITER ;

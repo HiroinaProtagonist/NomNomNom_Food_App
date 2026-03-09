@@ -53,6 +53,9 @@ UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=:FOOD_ITEM_ID, ORDER_ID=:ORDER_ID WHER
 
 -- Deleting a FOOD_ITEM results in deleting that item from FOOD_ITEMS_ORDERS by CASCADE
 -- and explicitly from the ORDERS table via a JOIN involving the intersection table.
-DELETE FROM ORDERS
+-- Citation for the syntax for the DELETE with JOIN. Date: 3/7/2026
+-- Developed with reference to:
+-- Source URL: https://stackoverflow.com/questions/2763206/deleting-rows-with-mysql-left-join
+DELETE `FOOD_ITEMS_ORDERS`, `ORDERS` FROM ORDERS
     LEFT JOIN FOOD_ITEMS_ORDERS ON FOOD_ITEMS_ORDERS.ORDER_ID = ORDERS.ORDER_ID
     WHERE FOOD_ITEMS_ORDERS.FOOD_ITEM_ID = :FOOD_ITEM_ID_FROM_FORM;
