@@ -1,5 +1,8 @@
-# NomNomNom_Food_App
-CS340 Group 77 Project
+# Florio
+CS340 Group 126 Project
+
+I was previously working with a different group and have adapted my previous work with permission from the instructor.
+All previous work is included in the git history, which has diverged from the previous project, and I appreciate my previous partner.
 
 ##### Dotenv/.env Setup
 This implementation is based on having used dotenv before,
