@@ -54,7 +54,7 @@ app.get('/', async function (req, res) {
 app.get('/food_items', async function (req, res) {
     try {
         // Create and execute our queries
-        const food_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items.sql'), 'utf8');
+        const food_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
         const [food] = await db.query(food_query);
 
         const restaurant_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_restaurant_list.sql'), 'utf8');
@@ -66,7 +66,7 @@ app.get('/food_items', async function (req, res) {
         const food_rest_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_restaurant_dropdown.sql'), 'utf8');
         const [food_rest] = await db.query(food_rest_query);
 
-        // Render the food_items.hbs file, and also send the renderer
+        // Render the flowers.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('food_items', {food: food, restaurant: restaurant, foods: foods, food_rest: food_rest});
     } catch (error) {
@@ -96,15 +96,15 @@ app.get('/restaurants', async function (req, res) {
     }
 });
 
-app.get('/customers', async function (req, res) {
+app.get('/recipients', async function (req, res) {
     try {
         // Create and execute our queries
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'customers.sql'), 'utf8');
+        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
         const [customer] = await db.query(query1);
 
-        // Render the customers.hbs file, and also send the renderer
+        // Render the recipients.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('customers', { customer: customer});
+        res.render('recipients', { recipient: recipient});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -120,13 +120,13 @@ app.get('/food_items_orders', async function (req, res) {
         const intersection_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_orders.sql'), 'utf8');
         const [order] = await db.query(intersection_query);
 
-        const orders_query = fs.readFileSync(path.join(__dirname, 'queries', 'orders.sql'), 'utf8');
+        const orders_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets.sql'), 'utf8');
         const [orders] = await db.query(orders_query);
 
         const foods_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_list.sql'), 'utf8');
         const [foods] = await db.query(foods_query);
 
-        // Render the food_items_orders.hbs file, and also send the renderer
+        // Render the bouquets.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('food_items_orders', { order: order, orders: orders, foods: foods});
     } catch (error) {
@@ -144,7 +144,7 @@ app.get('/intersection', async function (req, res) {
         const intersection_query = fs.readFileSync(path.join(__dirname, 'queries', 'intersection.sql'), 'utf8');
         const [intersection] = await db.query(intersection_query);
 
-        // Render the customers.hbs file, and also send the renderer
+        // Render the recipients.hbs file, and also send the renderer
         //  an object that contains the results of the query
         res.render('intersection', { intersection: intersection});
     } catch (error) {
