@@ -13,6 +13,7 @@ DROP PROCEDURE IF EXISTS sp_ddl;
 DELIMITER //
 CREATE PROCEDURE sp_ddl()
 BEGIN
+    DECLARE descript1 VARCHAR(255);
     SET FOREIGN_KEY_CHECKS=0;
     SET AUTOCOMMIT = 0;
 
@@ -167,31 +168,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- To demonstrate RESET
-DROP PROCEDURE IF EXISTS sp_delete_french_fries;
-DELIMITER //
-CREATE PROCEDURE sp_delete_french_fries()
-BEGIN
-    DECLARE fry_id INT;
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        -- Rollback if failure in any statement and show failure message
-        ROLLBACK;
-        SELECT 'Error. Rollback triggered.' AS Result;
-    END;
-
-    -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
-    START TRANSACTION;
-        -- Get item to delete and execute deletes
-        SELECT FOOD_ITEM_ID INTO fry_id FROM FOOD_ITEMS WHERE NAME = 'French Fries';
-        DELETE FROM `FOOD_ITEMS_ORDERS` WHERE `FOOD_ITEM_ID` = fry_id;
-        DELETE FROM `FOOD_ITEMS` WHERE `FOOD_ITEM_ID` = fry_id;
-    -- Commit transaction and show success message
-    COMMIT;
-    SELECT 'Delete of food item successful' AS Result;
-END //
-DELIMITER ;
-
 -- FLOWERS CUD operations
 -- To create/insert into the FLOWERS table
 DROP PROCEDURE IF EXISTS sp_create_flower;
@@ -242,7 +218,7 @@ BEGIN
         SELECT 'Error. Rollback triggered.' AS Result;
     END;
 
-    -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
+    -- Initiate transaction
     START TRANSACTION;
         DELETE FROM `FLOWERS` WHERE FLOWER_ID = in_flower_id;
 
@@ -256,75 +232,5 @@ BEGIN
     -- Commit transaction and show success message
     COMMIT;
     SELECT 'Flower successfully deleted' AS Result;
-END //
-DELIMITER ;
-
--- FOOD_ITEMS_ORDERS CUD operations
--- TODO Use logic to choose the correct update statement depending on whether both or either field is populated
-
--- -- To update from the FOOD_ITEMS_ORDERS table by FOOD_ITEM_ID
--- DROP PROCEDURE IF EXISTS sp_update_food_item_order_record;
--- DELIMITER //
--- CREATE PROCEDURE sp_update_food_item_order_record(
---     IN in_food_item_id INT,
---     IN in_order_id INT)
--- BEGIN
---     UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id, ORDER_ID=in_order_id
---         WHERE FOOD_ITEM_ID=in_food_item_id;
--- END //
--- DELIMITER ;
-
--- To delete from the FOOD_ITEMS table by food_item_id
-DROP PROCEDURE IF EXISTS sp_delete_food_item_order_record;
-DELIMITER //
-CREATE PROCEDURE sp_delete_food_item_order_record(
-    IN in_food_item_id INT,
-    IN in_order_id INT
-)
-BEGIN
-    DECLARE error_message VARCHAR(255);
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        -- Rollback if failure in any statement and show failure message
-        ROLLBACK;
-        SELECT 'Error. Rollback triggered.' AS Result;
-    END;
-
-    -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
-    START TRANSACTION;
-        -- Get item to delete and execute deletes
-        DELETE FROM `FOOD_ITEMS_ORDERS` WHERE `FOOD_ITEM_ID` = food_item_id AND `ORDER_ID` = order_id;
-
-        -- ROW_COUNT() returns the number of rows affected by the preceding statement.
-        IF ROW_COUNT() = 0 THEN
-            SET error_message = CONCAT(
-                'No matching record found in FOOD_ITEMS_ORDERS for given FOOD_ITEM_ID: ',
-                in_food_item_id);
-            -- Trigger custom error, invoke EXIT HANDLER
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
-        END IF;
-
-    -- Commit transaction and show success message
-    COMMIT;
-    SELECT 'Delete of food item successful' AS Result;
-END //
-DELIMITER ;
-
--- To get
-
--- To update from the FOOD_ITEMS_ORDERS table
-DROP PROCEDURE IF EXISTS sp_update_food_order_item;
-DELIMITER //
-CREATE PROCEDURE sp_update_food_order_item(
-    IN in_order_id INT,
-    IN in_food_item_id INT,
-    IN in_quantity INT)
-BEGIN
-    UPDATE FOOD_ITEMS_ORDERS SET FOOD_ITEM_ID=in_food_item_id
-    WHERE ORDER_ID=in_order_id;
-
-    UPDATE ORDERS SET TOTAL_PRICE=(in_quantity *
-        (SELECT PRICE FROM FOOD_ITEMS WHERE FOOD_ITEM_ID=in_food_item_id))
-    WHERE ORDER_ID=in_order_id;
 END //
 DELIMITER ;

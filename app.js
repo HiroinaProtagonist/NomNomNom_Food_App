@@ -20,12 +20,6 @@ const path = require('path');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// This had to be updated in order to render the CSS after submitting the
-// Select Food Item to Update form and re-rendering the food_items view
-// Citation to resolve the MIME type error on render after form submission. Date: 3/9/2026
-// Developed with reference to:
-// Source URL: https://stackoverflow.com/a/50182308
-// app.use(express.static(__dirname + 'public'));
 app.use(express.static('public'));
 
 const PORT = 9177;
@@ -65,7 +59,7 @@ app.get('/flowers', async function (req, res) {
 
         // Render the flowers.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('flowers', {flower: flower, color: color});    //, restaurant: restaurant, foods: foods, food_rest: food_rest});
+        res.render('flowers', {flower: flower, color: color});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -170,22 +164,7 @@ app.get('/intersection', async function (req, res) {
     }
 });
 
-// #####################  DELETE REQUEST TO DEMO RESET  #############################
-app.get('/demo-reset', async function(req, res) {
-    try {
-        const query_sp_delete = 'CALL sp_delete_french_fries;';
-        await db.query(query_sp_delete);
-        console.log("Demo successful")
-
-        // Redirect to the food_items page to show the deleted element
-        res.redirect('/food_items');
-    } catch (error) {
-        console.error("Error in PL/SQL execution: ", error);
-        res.status(500).send('An error occurred while executing the database queries.');
-    }
-});
-
-// #####################  DELETE REQUEST TO DEMO RESET  #############################
+// #####################  RESET  #############################
 app.get('/reset', async function(req, res) {
     try {
         const query_sp_ddl = 'CALL sp_ddl;';
@@ -201,7 +180,7 @@ app.get('/reset', async function(req, res) {
     }
 });
 
-// ############################# CREATE FOOD ITEM REQUEST ############################
+// ############################# CREATE FLOWER REQUEST ############################
 app.post('/flowers/create',
     async function (req, res) {
     try {
@@ -209,9 +188,6 @@ app.post('/flowers/create',
         let data = req.body;
 
         console.log("Data: " + JSON.stringify(data));
-        // console.log("Type: " + typeof data.create_food_item_name.value);
-        // if (typeof data.create_food_item_name !== 'string') { data.food_item_name = 'Rename'; }
-
         // Safely call SP for create and get row created (last inserted)
         const create_flower_query = `CALL sp_create_flower(?, ?, ?, @created_id);`;
         await db.query(create_flower_query, [
@@ -231,7 +207,7 @@ app.post('/flowers/create',
     }
 });
 
-// ############################# UPDATE FOOD ITEM REQUESTS ############################
+// ############################# UPDATE FLOWER REQUEST ############################
 app.post('/flowers/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
@@ -258,8 +234,7 @@ app.post('/flowers/update', async function (req, res) {
     }
 });
 
-
-// ############################# DELETE FOOD ITEM REQUEST ############################
+// ############################# DELETE FLOWER REQUEST ############################
 // DELETE ROUTES
 app.post('/flowers/delete', async function (req, res) {
     try {
@@ -276,32 +251,6 @@ app.post('/flowers/delete', async function (req, res) {
 
         // Redirect the user to the updated webpage data
         res.redirect('/flowers');
-    } catch (error) {
-        console.error('Error executing queries:', error);
-        // Send a generic error message to the browser
-        res.status(500).send(
-            'An error occurred while executing the database queries.'
-        );
-    }
-});
-
-// ############################# UPDATE ORDERS REQUEST ############################
-app.post('/food_items_orders/update', async function (req, res) {
-    try {
-        //Process data (access and sanitize)
-        const data = req.body;
-        // console.log(`Data: ${JSON.stringify(data)}`);
-        // if (typeof data !== 'string') { data. = }
-
-        const update_query = 'CALL sp_update_food_order_item(?, ?, ?);';
-        await db.query(update_query, [
-            data.update_order_id,
-            data.update_food_item_id,
-            data.update_quantity,
-        ]);
-
-        // Redirect the user to the updated webpage data
-        res.redirect('/food_items_orders');
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
