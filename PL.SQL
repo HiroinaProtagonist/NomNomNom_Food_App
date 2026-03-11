@@ -16,6 +16,7 @@ BEGIN
     SET FOREIGN_KEY_CHECKS=0;
     SET AUTOCOMMIT = 0;
 
+    DROP TABLE IF EXISTS COLORS;
     DROP TABLE IF EXISTS FLOWERS_BOUQUETS;
     DROP TABLE IF EXISTS BOUQUETS;
     DROP TABLE IF EXISTS FLOWERS;
@@ -47,7 +48,7 @@ BEGIN
          NAME VARCHAR(50) NOT NULL,
          COLOR_ID INT(11) NOT NULL,
          MEANING VARCHAR(50) NOT NULL,
-         FOREIGN KEY (COLOR_ID) REFERENCES COLORS(COLOR_ID) ON DELETE CASCADE ON UPDATE CASCADE,
+         FOREIGN KEY (COLOR_ID) REFERENCES COLORS(COLOR_ID),
          PRIMARY KEY (FLOWER_ID)
     );
 
@@ -102,10 +103,10 @@ BEGIN
     INSERT INTO RECIPIENTS (FNAME, LNAME, PHONE, HANDLE, EMAIL)
     VALUES
         ('Anya', 'Noches', '5079814543',
-         'Thorne', 'hawthorne@gmail.com'),
+         'Yaaaya', 'noches_a@gmail.com'),
         ('William', 'Bennett', '1234567890',
-         'WILLL444', 'coulibaly_yara@mail.com'),
-        ('Lilith', 'Jones', NULL, 'ITSLIL', NULL);
+         'WILLL444', 'bennettw@mail.com'),
+        ('Lilith', 'Jones', NULL, 'ITSLIL', 'thislilith7@aol.com');
 
     INSERT INTO FLOWERS (NAME, MEANING, COLOR_ID)
     VALUES
@@ -118,7 +119,7 @@ BEGIN
     INSERT INTO BOUQUETS (NAME, DESCRIPTION, MAKER_ID, RECIPIENT_ID)
     VALUES
         ('FirstBouquet', NULL, (SELECT MAKER_ID FROM MAKERS WHERE HANDLE='TheOneTrueKing'), NULL),
-        ('AnyColor', NULL, (SELECT MAKER_ID FROM MAKERS WHERE HANDLE='TheOneTrueKing'), NULL),
+        ('AnyColor', NULL, (SELECT MAKER_ID FROM MAKERS WHERE HANDLE='CoolYara'), NULL),
         ('AllCarnations', NULL, (SELECT MAKER_ID FROM MAKERS WHERE HANDLE='TheOneTrueKing'), NULL);
 
     INSERT INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
@@ -191,51 +192,47 @@ BEGIN
 END //
 DELIMITER ;
 
--- FOOD_ITEMS CUD operations
--- To create/insert into the FOOD_ITEMS table
-DROP PROCEDURE IF EXISTS sp_create_food_item;
+-- FLOWERS CUD operations
+-- To create/insert into the FLOWERS table
+DROP PROCEDURE IF EXISTS sp_create_flower;
 DELIMITER //
-CREATE PROCEDURE sp_create_food_item(
-    IN in_restaurant_id INT,
-    IN in_food_item_name VARCHAR(255),
-    IN in_price DECIMAL(6,2),
-    OUT out_food_item_id INT)
+CREATE PROCEDURE sp_create_flower(
+    IN in_flower_name VARCHAR(50),
+    IN in_flower_meaning VARCHAR(50),
+    IN in_color_id INT,
+    OUT out_flower_id INT)
 BEGIN
-    INSERT INTO FOOD_ITEMS (RESTAURANT_ID, NAME, PRICE)
-    VALUES (in_restaurant_id, in_food_item_name, in_price);
+    INSERT INTO FLOWERS (NAME, MEANING, COLOR_ID)
+    VALUES (in_flower_name, in_flower_meaning, in_color_id );
 
     -- Store the ID of the last inserted row
-    SELECT LAST_INSERT_ID() into out_food_item_id;
+    SELECT LAST_INSERT_ID() into out_flower_id;
 
-    -- Display the ID of the last inserted person.
-    SELECT LAST_INSERT_ID() AS 'New food item inserted: ';
+    -- Display the ID of the last inserted flower.
+    SELECT LAST_INSERT_ID() AS 'New flower inserted: ';
 END //
 DELIMITER ;
 
--- To update from the FOOD_ITEMS table
-DROP PROCEDURE IF EXISTS sp_update_food_item;
+-- To update from the FLOWERS table
+DROP PROCEDURE IF EXISTS sp_update_flower;
 DELIMITER //
-CREATE PROCEDURE sp_update_food_item(
-    IN in_food_item_id_to_change INT,
-    IN in_restaurant_id_to_change INT,
-    IN in_restaurant_id INT,
-    IN in_food_item_name VARCHAR(255),
-    IN in_price DECIMAL(6,2))
+CREATE PROCEDURE sp_update_flower(
+    IN in_flower_id INT,
+    IN in_flower_name VARCHAR(50),
+    IN in_flower_meaning VARCHAR(50),
+    IN in_color_id INT)
 BEGIN
-    UPDATE FOOD_ITEMS AS FI
-    LEFT JOIN RESTAURANTS AS R ON FI.RESTAURANT_ID = R.RESTAURANT_ID
-    SET FI.RESTAURANT_ID=in_restaurant_id, FI.NAME=in_food_item_name, FI.PRICE=in_price
-    WHERE FI.FOOD_ITEM_ID=in_food_item_id_to_change AND R.RESTAURANT_ID=in_restaurant_id_to_change;
+    UPDATE FLOWERS AS F
+    SET F.NAME=in_flower_name, F.MEANING=in_flower_meaning, F.COLOR_ID = in_color_id
+    WHERE F.FLOWER_ID=in_flower_id;
 
-    -- If any orders include this food item, update them
-    UPDATE
 END //
 DELIMITER ;
 
--- To delete from the FOOD_ITEMS table
-DROP PROCEDURE IF EXISTS sp_delete_food_item;
+-- To delete from the FLOWERS table
+DROP PROCEDURE IF EXISTS sp_delete_flower;
 DELIMITER //
-CREATE PROCEDURE sp_delete_food_item(IN in_food_item_id INT)
+CREATE PROCEDURE sp_delete_flower(IN in_flower_id INT)
 BEGIN
     DECLARE error_message VARCHAR(255);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -247,26 +244,18 @@ BEGIN
 
     -- Initiate transaction to delete from FOOD_ITEMS and FOOD_ITEMS_ORDERS tables
     START TRANSACTION;
-        -- Get item to delete and execute deletes
-        -- Citation for the syntax for the DELETE with JOIN. Date: 3/7/2026
-        -- Developed with reference to:
-        -- Source URL: https://stackoverflow.com/questions/2763206/deleting-rows-with-mysql-left-join
-        DELETE `ORDERS` FROM ORDERS
-            LEFT JOIN FOOD_ITEMS_ORDERS ON FOOD_ITEMS_ORDERS.ORDER_ID = ORDERS.ORDER_ID
-            WHERE FOOD_ITEMS_ORDERS.FOOD_ITEM_ID = in_food_item_id;
-
-        DELETE FROM `FOOD_ITEMS` WHERE FOOD_ITEM_ID = in_food_item_id;
+        DELETE FROM `FLOWERS` WHERE FLOWER_ID = in_flower_id;
 
         -- ROW_COUNT() returns the number of rows affected by the preceding statement.
         IF ROW_COUNT() = 0 THEN
-            set error_message = CONCAT('No matching record found in FOOD_ITEMS table for id: ', in_food_item_id);
+            set error_message = CONCAT('No matching record found in FLOWERS table for id: ', in_flower_id);
             -- Trigger custom error, invoke EXIT HANDLER
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
         END IF;
 
     -- Commit transaction and show success message
     COMMIT;
-    SELECT 'Delete of food item successful' AS Result;
+    SELECT 'Flower successfully deleted' AS Result;
 END //
 DELIMITER ;
 

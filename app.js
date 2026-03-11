@@ -51,24 +51,21 @@ app.get('/', async function (req, res) {
     }
 });
 
-app.get('/food_items', async function (req, res) {
+app.get('/flowers', async function (req, res) {
     try {
         // Create and execute our queries
-        const food_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
-        const [food] = await db.query(food_query);
+        const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
+        const [flower] = await db.query(flower_query);
 
-        const restaurant_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_restaurant_list.sql'), 'utf8');
-        const [restaurant] = await db.query(restaurant_query);
+        const colors_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
+        const [color] = await db.query(colors_query);
+        // console.log(`Color: ${JSON.stringify(color)}`);
 
-        const foods_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_list.sql'), 'utf8');
-        const [foods] = await db.query(foods_query);
-
-        const food_rest_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_restaurant_dropdown.sql'), 'utf8');
-        const [food_rest] = await db.query(food_rest_query);
+        // Flowers list for dropdown
 
         // Render the flowers.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('food_items', {food: food, restaurant: restaurant, foods: foods, food_rest: food_rest});
+        res.render('flowers', {flower: flower, color: color});    //, restaurant: restaurant, foods: foods, food_rest: food_rest});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -78,15 +75,15 @@ app.get('/food_items', async function (req, res) {
     }
 });
 
-app.get('/restaurants', async function (req, res) {
+app.get('/colors', async function (req, res) {
     try {
         // Create and execute our queries
-        const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'restaurants.sql'), 'utf8');
-        const [restaurant] = await db.query(query1);
+        const colors_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
+        const [color] = await db.query(colors_query);
 
-        // Render the restaurants.hbs file, and also send the renderer
+        // Render the recipients.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('restaurants', { restaurant: restaurant});
+        res.render('colors', { color: color});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -100,7 +97,7 @@ app.get('/recipients', async function (req, res) {
     try {
         // Create and execute our queries
         const query1 = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
-        const [customer] = await db.query(query1);
+        const [recipient] = await db.query(query1);
 
         // Render the recipients.hbs file, and also send the renderer
         //  an object that contains the results of the query
@@ -114,21 +111,38 @@ app.get('/recipients', async function (req, res) {
     }
 });
 
-app.get('/food_items_orders', async function (req, res) {
+app.get('/makers', async function (req, res) {
+    try {
+        // Create and execute our queries
+        const makers_query = fs.readFileSync(path.join(__dirname, 'queries', 'makers.sql'), 'utf8');
+        const [maker] = await db.query(makers_query);
+
+        // Render the recipients.hbs file, and also send the renderer
+        //  an object that contains the results of the query
+        res.render('makers', { maker: maker});
+    } catch (error) {
+        console.error('Error executing queries:', error);
+        // Send a generic error message to the browser
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+app.get('/bouquets', async function (req, res) {
     try {
         // Create and execute queries
-        const intersection_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_orders.sql'), 'utf8');
-        const [order] = await db.query(intersection_query);
+        const bouquet_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets.sql'), 'utf8');
+        const [bouquet] = await db.query(bouquet_query);
+        // console.log(JSON.stringify(bouquet));
 
-        const orders_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets.sql'), 'utf8');
-        const [orders] = await db.query(orders_query);
-
-        const foods_query = fs.readFileSync(path.join(__dirname, 'queries', 'food_items_list.sql'), 'utf8');
-        const [foods] = await db.query(foods_query);
+        const colors_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
+        const [color] = await db.query(colors_query);
+        // console.log(`Color: ${JSON.stringify(color)}`);
 
         // Render the bouquets.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('food_items_orders', { order: order, orders: orders, foods: foods});
+        res.render('bouquets', { bouquet: bouquet, color: color});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -178,8 +192,8 @@ app.get('/reset', async function(req, res) {
         await db.query(query_sp_ddl);
         console.log("Reset successful")
 
-        // Redirect to the food_items page to show the reset
-        res.redirect('/food_items');
+        // Redirect to the home page
+        res.redirect('/');
 
     } catch (error) {
         console.error("Error in PL/SQL execution: ", error);
@@ -188,26 +202,26 @@ app.get('/reset', async function(req, res) {
 });
 
 // ############################# CREATE FOOD ITEM REQUEST ############################
-app.post('/food_items/create',
+app.post('/flowers/create',
     async function (req, res) {
     try {
         // Access and Sanitize form data
         let data = req.body;
 
-        // console.log("Data: " + JSON.stringify(data));
+        console.log("Data: " + JSON.stringify(data));
         // console.log("Type: " + typeof data.create_food_item_name.value);
         // if (typeof data.create_food_item_name !== 'string') { data.food_item_name = 'Rename'; }
 
         // Safely call SP for create and get row created (last inserted)
-        const create_food_item_query = `CALL sp_create_food_item(?, ?, ?, @created_id);`;
-        const [[[results]]] = await db.query(create_food_item_query, [
-            data.create_food_item_restaurant_id,
-            data.create_food_item_name,
-            data.create_food_item_price,
+        const create_flower_query = `CALL sp_create_flower(?, ?, ?, @created_id);`;
+        await db.query(create_flower_query, [
+            data.create_flower_name,
+            data.create_flower_meaning,
+            data.create_color_id,
         ]);
 
         // Redirect the user to the updated webpage
-        res.redirect('/food_items');
+        res.redirect('/flowers');
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -217,27 +231,24 @@ app.post('/food_items/create',
     }
 });
 
-
-
 // ############################# UPDATE FOOD ITEM REQUESTS ############################
-app.post('/food_items/update', async function (req, res) {
+app.post('/flowers/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        console.log(`FU-Data: ${JSON.stringify(data)}`)
+        // console.log(`FData: ${JSON.stringify(data)}`)
         // if (typeof data !== 'string') { data. = }
 
-        const update_query = 'CALL sp_update_food_item(?, ?, ?, ?, ?);';
+        const update_query = 'CALL sp_update_flower(?, ?, ?, ?);';
         await db.query(update_query, [
-            data.update_select_food_item[0],
-            data.update_select_food_item[1],
-            data.update_food_item_restaurant_id,
-            data.update_food_item_name,
-            data.update_food_item_price,
+            data.update_select_flower_id,
+            data.update_flower_name,
+            data.update_flower_meaning,
+            data.update_color_id,
         ]);
 
         // Redirect the user to the updated webpage data
-        res.redirect('/food_items');
+        res.redirect('/flowers');
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -250,21 +261,21 @@ app.post('/food_items/update', async function (req, res) {
 
 // ############################# DELETE FOOD ITEM REQUEST ############################
 // DELETE ROUTES
-app.post('/food_items/delete', async function (req, res) {
+app.post('/flowers/delete', async function (req, res) {
     try {
         // Get input from form and apply to request
         let data = req.body;
-        console.log(`Body: ${JSON.stringify(data)}`)
+        // console.log(`Body: ${JSON.stringify(data)}`)
 
         // Create/execute parameterized query
-        const query_sp_delete_food_item = `CALL sp_delete_food_item(?);`;
-        await db.query(query_sp_delete_food_item, [data.delete_food_item_id]);
+        const query_sp_delete_flower = `CALL sp_delete_flower(?);`;
+        await db.query(query_sp_delete_flower, [data.delete_flower_id]);
 
-        // Log the id and name being deleted
-        console.log(`DELETE from FOOD_ITEMS: Food item id: ${data.delete_food_item_id}, Name: ${data.delete_food_item_name}, Restaurant id: ${data.delete_restaurant_id}`);
+        // Log the flower id and name being deleted
+        console.log(`DELETE from FLOWERS: Flower id: ${data.delete_flower_id}, Name: ${data.delete_flower_name}`);
 
         // Redirect the user to the updated webpage data
-        res.redirect('/food_items');
+        res.redirect('/flowers');
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -279,7 +290,7 @@ app.post('/food_items_orders/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        console.log(`Data: ${JSON.stringify(data)}`);
+        // console.log(`Data: ${JSON.stringify(data)}`);
         // if (typeof data !== 'string') { data. = }
 
         const update_query = 'CALL sp_update_food_order_item(?, ?, ?);';
