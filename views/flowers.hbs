@@ -4,14 +4,14 @@
 <!--https://canvas.oregonstate.edu/courses/2031764/assignments/10323339?module_item_id=26243440)-->
 <!--Changes made beyond the starter code are our own without reference to AI-->
 
-<h1>Food Items</h1>
+<h1>Flowers</h1>
 
 {{! READ table }}
 <table>
     <thead>
-        {{! For the table header row, we print the DB attribute names }}
+        {{! HEADERS }}
         <tr>
-            {{#each food.[0]}}
+            {{#each flower.[0]}}
             <th>
                 {{@key}}
             </th>
@@ -21,19 +21,18 @@
     </thead>
 
     <tbody>
-        {{#each food}}
+        {{! FIELDS }}
+        {{#each flower}}
         <tr>
-            <td>{{this.RESTAURANT_ID}}</td>
-            <td>{{this.RESTAURANT}}</td>
-            <td>{{this.FOOD_ITEM_ID}}</td>
-            <td>{{this.FOOD}}</td>
-            <td>{{this.PRICE}}</td>
+            <td>{{this.FLOWER_ID}}</td>
+            <td>{{this.NAME}}</td>
+            <td>{{this.MEANING}}</td>
+            <td>{{this.COLOR}}</td>
 
             {{! DELETE form }}
-            <form id='delete_food_item_form' METHOD='POST' action='/food_items/delete'>
-                <input type='hidden' name='delete_food_item_id' value='{{this.FOOD_ITEM_ID}}' />
-                <input type='hidden' name='delete_food_item_name' value='{{this.FOOD}}' />
-                <input type='hidden' name='delete_restaurant_id' value='{{this.RESTAURANT_ID}}' />
+            <form id='delete_flower_form' METHOD='POST' action='/flowers/delete'>
+                <input type='hidden' name='delete_flower_id' value='{{this.FLOWER_ID}}' />
+                <input type='hidden' name='delete_flower_name' value='{{this.NAME}}' />
                 <td>
                     <button type='submit'>
                         Delete
@@ -47,23 +46,19 @@
 
 {{! CREATE form }}
 </br>
-<h2>Create a New Food Item</h2>
-<form class='cuForm' id='create_food_item_form' METHOD='POST' action='/food_items/create'>
-    <label for='create_food_item_name'>Name: </label>
-    <input type='text' name='create_food_item_name' id='create_food_item_name' required />
+<h2>Create a New Flower</h2>
+<form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
+    <label for='create_flower_name'>Name: </label>
+    <input type='text' name='create_flower_name' id='create_flower_name' required />
 
-    <label for='create_food_item_price'>Price: </label>
-    <!-- Citation for the step field in the following control. Date: 3/6/2026
-         Developed with reference to:
-         Source URL: https://amydegregorio.com/2017/11/22/html5-number-input-the-step-attribute/ -->
-    <input type='number' step=".01" name='create_food_item_price' id='create_food_item_price' min='0' />
+    <label for='create_flower_meaning'>Meaning: </label>
+    <input type='text' name='create_flower_meaning' id='create_flower_meaning' required />
 
-    <label for='create_food_item_restaurant_id'>Restaurant: </label>
-    <select name='create_food_item_restaurant_id' id='create_food_item_restaurant_id'>
-        <option value='NULL' disabled selected>Select a Restaurant</option>
-<!--        <option value='NULL'>&lt; None &gt;</option>-->
-        {{#each restaurant}}
-        <option value='{{this.RESTAURANT_ID}}' required>{{this.NAME}}</option>
+    <label for='create_color_id'>Color: </label>
+    <select name='create_color_id' id='create_color_id'>
+        <option value='NULL' disabled selected>Select a Color</option>
+        {{#each color}}
+            <option value='{{this.COLOR_ID}}' required>{{this.COLOR}}</option>
         {{/each}}
     </select>
     <input type='submit' />
@@ -71,40 +66,35 @@
 
 </br><br/>
 {{! UPDATE form }}
-{{! FOOD_ITEM needs the following fields in order to update: FOOD_ITEM_ID, RESTAURANT_ID, NAME (name of the food), and a PRICE }}
-<h2>Update a Food Item</h2>
-<form class='cuForm' id='update_food_item_form' METHOD='POST' action='/food_items/update'>
-    <label for='update_select_food_item'>Food Item to Update: </label>
-    <select name='update_select_food_item' id='update_select_food_item' required>
-        <option value='' disabled selected>Select a Food Item</option>
-        {{#each food_rest}}
-        <option value='{{this.FOOD_ITEM_ID}}{{this.RESTAURANT_ID}}' required>
-            {{this.FOOD_ITEM_ID}}: {{this.NAME}} - {{this.R_NAME}}
+<h2>Update a Flower</h2>
+<form class='cuForm' id='update_flower_form' METHOD='POST' action='/flowers/update'>
+    <label for='update_select_flower_id'>Flower to Update: </label>
+    <select name='update_select_flower_id' id='update_select_flower_id' required>
+        <option value='' disabled selected>Select a Flower</option>
+        {{#each flower}}
+        <option value='{{this.FLOWER_ID}}' required>
+            {{this.FLOWER_ID}}: {{this.NAME}}
         </option>
         {{/each}}
     </select>
 
     <br/>
 
-    <label for='update_food_item_name'>Name: </label>
-    <input type="text" name='update_food_item_name' id='update_food_item_name' value='{{update_select_food_item_id}}'>
+    <label for='update_flower_name'>Name: </label>
+    <input type="text" name='update_flower_name' id='update_flower_name' value='{{update_flower_name}}'>
 
-    <label for='update_food_item_restaurant_id'>Restaurant: </label>
-    <select name='update_food_item_restaurant_id' id='update_food_item_restaurant_id'>
-        <option value='NULL' disabled selected>Select a Restaurant</option>
-        {{#each restaurant}}
-            <option value='{{this.RESTAURANT_ID}}' required>
-                {{this.NAME}}
+    <label for='update_flower_meaning'>Meaning: </label>
+    <input type="text" name='update_flower_meaning' id='update_flower_meaning' value='{{update_flower_meaning}}'>
+
+    <label for='update_color_id'>Color: </label>
+    <select name='update_color_id' id='update_color_id'>
+        <option value='NULL' disabled selected>Select a Color</option>
+        {{#each color}}
+            <option value='{{this.COLOR_ID}}' required>
+                {{this.COLOR}}
             </option>
         {{/each}}
     </select>
-
-    <label for='update_food_item_price'>Price: </label>
-
-    <!-- Citation for the step field in the following control. Date: 2/15/2026
-         Developed with reference to:
-         Source URL: https://amydegregorio.com/2017/11/22/html5-number-input-the-step-attribute/ -->
-    <input type='number' step=".001" name='update_food_item_price' id='update_food_item_price' min='.01' />
 
     <input type='submit' />
 </form>

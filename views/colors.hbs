@@ -3,14 +3,14 @@
 <!--(https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419-->
 <!--Changes made beyond the starter code are our own without reference to AI-->
 
-<h1>Recipients</h1>
+<h1>Colors</h1>
 
 {{! READ table }}
 <table>
     <thead>
-        {{! Print DB attribute names for the table header row }}
+        {{! HEADER }}
         <tr>
-            {{#each recipient.[0]}}
+            {{#each color.[0]}}
             <th>
                 {{@key}}
             </th>
@@ -19,12 +19,11 @@
     </thead>
 
     <tbody>
-        {{#each recipient}}
+        {{! FIELDS }}
+        {{#each color}}
         <tr>
-            <td>{{this.NAME}}</td>
-            <td>{{this.HANDLE}}</td>
-            <td>{{this.EMAIL}}</td>
-            <td>{{this.PHONE}}</td>
+            <td>{{this.COLOR_ID}}</td>
+            <td>{{this.COLOR}}</td>
         </tr>
         {{/each}}
     </tbody>

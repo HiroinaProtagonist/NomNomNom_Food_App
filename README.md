@@ -1,8 +1,9 @@
 # Florio
 CS340 Group 126 Project
 
-I was previously working with a different group and have adapted my previous work with permission from the instructor.
-All previous work is included in the git history, which has diverged from the previous project, and I appreciate my previous partner.
+I was previously working with a different group. 
+I have adapted the previous collaborative work with permission from the instructor.
+All previous work is included in the git history, which has diverged from the previous project.
 
 ##### Dotenv/.env Setup
 This implementation is based on having used dotenv before,
