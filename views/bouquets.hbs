@@ -10,59 +10,133 @@
     <thead>
         {{! Headers }}
         <tr>
-            {{#each bouquet.[0]}}
+            {{#each bouquets.[0]}}
             <th>
                 {{@key}}
             </th>
             {{/each}}
+            <th></th>
+            <th></th>
         </tr>
     </thead>
 
     <tbody>
         {{! Fields }}
-        {{#each bouquet}}
-        <tr>
-            <td>{{this.BOUQUET_ID}}</td>
-            <td>{{this.BOUQUET}}</td>
-            <td>{{this.DESCRIPTION}}</td>
-            <td>{{this.FLOWER_ID}}</td>
-            <td>{{this.FLOWER}}</td>
-            <td>{{this.MAKER}}</td>
-            <td>{{this.RECIPIENT}}</td>
-        </tr>
+        {{#each bouquets}}
+            <tr>
+                <td>{{this.BOUQUET_ID}}</td>
+                <td>{{this.BOUQUET}}</td>
+                <td>{{this.DESCRIPTION}}</td>
+                <td>{{this.MAKER}}</td>
+                <td>{{this.RECIPIENT}}</td>
+
+                {{! UPDATE form }}
+                <form id='update_bouquet_form' METHOD='POST' action='/bouquet_edit'>
+                    <input type='hidden' name='update_bouquet_id' value='{{this.BOUQUET_ID}}' />
+<!--                    <input type='hidden' name='update_bouquet_name' value='{{this.BOUQUET}}' />-->
+<!--                    <input type='hidden' name='update_maker_id' value='{{this.MAKER_ID}}' />-->
+<!--                    <input type='hidden' name='update_recipient_id' value='{{this.RECIPIENT_ID}}' />-->
+                    <td>
+                        <button type='submit'>
+                            Edit
+                        </button>
+                    </td>
+                </form>
+
+                {{! DELETE form }}
+                <form id='delete_bouquet_form' METHOD='POST' action='/bouquets/delete'>
+                    <input type='hidden' name='delete_bouquet_id' value='{{this.BOUQUET_ID}}' />
+                    <input type='hidden' name='delete_bouquet_name' value='{{this.BOUQUET}}' />
+                    <td>
+                        <button type='submit'>
+                            Delete
+                        </button>
+                    </td>
+                </form>
+
+            </tr>
         {{/each}}
     </tbody>
 </table>
+</br>
 
-{{!-- Removed CREATE, do not need for M:M and already have on Food Items page --}}
+<h2>Create a New Bouquet</h2>
+<form class='cuForm' id='create_bouquet_form' METHOD='POST' action='/bouquets/create'>
+    <label for='create_bouquet_name'>Name: </label>
+    <input type='text' name='create_bouquet_name' id='create_bouquet_name' required />
+    <label for='create_bouquet_description'>Description: </label>
+    <input type='text' name='create_bouquet_description' id='create_bouquet_description' required />
+    <br/>
 
-{{! UPDATE form }}
+    <label for='create_maker_id'>Maker: </label>
+    <select name='create_maker_id' id='create_maker_id'>
+        <option value='NULL' disabled selected>Select a Maker</option>
+        {{#each makers}}
+            <option value='{{this.MAKER_ID}}' required>{{this.MAKER_ID}}-{{this.NAME}}</option>
+        {{/each}}
+    </select>
+
+    <label for='create_recipient_id'>Recipient: </label>
+    <select name='create_recipient_id' id='create_recipient_id'>
+        <option value='NULL' disabled selected>Select a Recipient</option>
+        {{#each recipients}}
+            <option value='{{this.RECIPIENT_ID}}' required>{{this.RECIPIENT_ID}}-{{this.NAME}}</option>
+        {{/each}}
+    </select>
+
+    <label for='create_bouquet_flowers'>Flowers: </label>
+    <select name='create_bouquet_flowers' id='create_bouquet_flowers' multiple>
+        <option value='NULL' disabled selected>Select Flowers</option>
+        {{#each flowers}}
+            <option value='{{this.FLOWER_ID}}' required>{{this.FLOWER_ID}}: {{this.COLOR}} {{this.NAME}}</option>
+        {{/each}}
+    </select>
+
+    <input type='submit' />
+</form>
+
+
+
+<!--{{! UPDATE form }}-->
 <!--</br>-->
 <!--<h2>Update a Bouquet</h2>-->
 <!--<form class='cuForm' id='update_bouquet_id_form' method='POST' action='/bouquets/update'>-->
-<!--    <label for='update_bouquet_id'>bouquet to Update: </label>-->
+<!--    <label for='update_bouquet_id'>Bouquet to Update: </label>-->
 <!--    <select name='update_bouquet_id' id='update_bouquet_id' required>-->
-<!--        <option value='' disabled selected>bouquet Number</option>-->
+<!--        <option value='' disabled selected>Bouquet</option>-->
 <!--        {{#each bouquets}}-->
 <!--        <option value='{{this.bouquet_ID}}' required>-->
 <!--            {{this.bouquet_ID}}-->
 <!--        </option>-->
 <!--        {{/each}}-->
 <!--    </select>-->
+<!--    <br/>-->
+<!--    <label for='update_bouquet_name'>Name: </label>-->
+<!--    <input type='text' name='update_bouquet_name' id='update_bouquet_name' required />-->
 
-<!--    <label for='update_bouquet_id'>Food Item to Update: </label>-->
-<!--    <select name='update_bouquet_id' id='update_bouquet_id'>-->
-<!--        <option value='' disabled selected>Food Item</option>-->
-<!--        &lt;!&ndash; Should be distinct values - ie Ribs only once?&ndash;&gt;-->
-<!--        {{#each foods}}-->
-<!--        <option value='{{this.BOUQUET_ID}}' required>-->
-<!--            {{this.NAME}}-->
-<!--        </option>-->
+<!--    <label for='update_maker_id'>Maker: </label>-->
+<!--    <select name='update_maker_id' id='update_maker_id'>-->
+<!--        <option value='NULL' disabled selected>Select a Maker</option>-->
+<!--        {{#each maker}}-->
+<!--            <option value='{{this.MAKER_ID}}' required>{{this.MAKER}}</option>-->
+<!--        {{/each}}-->
+<!--    </select>-->
+<!--    <br/>-->
+
+<!--    <label for='create_maker_flowers'>Flowers: </label>-->
+<!--    <select name='create_maker_flowers' id='create_maker_flowers'>-->
+<!--        <option value='NULL' disabled selected>Select Flowers</option>-->
+<!--        {{#each flower}}-->
+<!--            <option value='{{this.FLOWER_ID}}' required>{{this.FLOWER}}</option>-->
 <!--        {{/each}}-->
 <!--    </select>-->
 
-<!--    <label for='update_bouquet_quantity'>Quantity: </label>-->
-<!--    <input type='number' name='update_quantity' id='update_quantity' min='1' />-->
-
+<!--    <label for='create_recipient_id'>Recipient: </label>-->
+<!--    <select name='create_recipient_id' id='create_recipient_id'>-->
+<!--        <option value='NULL' disabled selected>Select a Recipient</option>-->
+<!--        {{#each recipient}}-->
+<!--            <option value='{{this.RECIPIENT_ID}}' required>{{this.RECIPIENT}}</option>-->
+<!--        {{/each}}-->
+<!--    </select>-->
 <!--    <input type='submit' />-->
 <!--</form>-->

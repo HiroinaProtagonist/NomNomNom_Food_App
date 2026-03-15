@@ -126,17 +126,23 @@ app.get('/makers', async function (req, res) {
 app.get('/bouquets', async function (req, res) {
     try {
         // Create and execute queries
-        const bouquet_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets.sql'), 'utf8');
-        const [bouquet] = await db.query(bouquet_query);
+        const bouquet_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
+        const [bouquets_fields] = await db.query(bouquet_query);
         // console.log(JSON.stringify(bouquet));
 
-        const colors_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
-        const [color] = await db.query(colors_query);
+        const maker_query = fs.readFileSync(path.join(__dirname, 'queries', 'makers.sql'), 'utf8');
+        const [makers_fields] = await db.query(maker_query);
+
+        const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
+        const [flowers_fields] = await db.query(flower_query);
         // console.log(`Color: ${JSON.stringify(color)}`);
+
+        const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
+        const [recipients_fields] = await db.query(recipient_query);
 
         // Render the bouquets.hbs file, and also send the renderer
         //  an object that contains the results of the query
-        res.render('bouquets', { bouquet: bouquet, color: color});
+        res.render('bouquets', { bouquets: bouquets_fields, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -235,7 +241,6 @@ app.post('/flowers/update', async function (req, res) {
 });
 
 // ############################# DELETE FLOWER REQUEST ############################
-// DELETE ROUTES
 app.post('/flowers/delete', async function (req, res) {
     try {
         // Get input from form and apply to request
@@ -251,6 +256,117 @@ app.post('/flowers/delete', async function (req, res) {
 
         // Redirect the user to the updated webpage data
         res.redirect('/flowers');
+    } catch (error) {
+        console.error('Error executing queries:', error);
+        // Send a generic error message to the browser
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+// ############################# CREATE BOUQUET REQUEST ############################
+app.post('/bouquets/create',
+    async function (req, res) {
+        try {
+            // Access and Sanitize form data
+            let data = req.body;
+            console.log("Data: " + JSON.stringify(data));
+
+            // Safely call SP for create and get row created (last inserted)
+            const create_bouquet_query = `CALL sp_create_bouquet(?, ?, ?, ?, @created_id);`;
+            const created_id = await db.query(create_bouquet_query, [
+                data.create_bouquet_name,
+                data.create_bouquet_description,
+                data.create_maker_id,
+                data.create_recipient_id,
+            ]);
+
+            console.log("Created: " + JSON.stringify(created_id));
+
+            //Add selected flowers to bouquet
+            for (flower in data.add_bouquet_flowers) {
+                const flower_query = 'CALL sp_add_ftob(?, ?);';
+                await db.query(flower_query, [
+                    flower,
+                    data.created_id
+                ]);
+            }
+
+            // Redirect the user to the updated webpage
+            res.redirect('/bouquets');
+        } catch (error) {
+            console.error('Error executing queries:', error);
+            // Send a generic error message to the browser
+            res.status(500).send(
+                'An error occurred while executing the database queries.'
+            );
+        }
+    });
+
+// ############################# UPDATE FLOWER REQUEST ############################
+app.post('/bouquet_edit', async function (req, res) {
+    try {
+        //Process data (access and sanitize)
+        const data = req.body;
+        console.log(`Redirect Data: ${JSON.stringify(data)}`)
+        // if (typeof data !== 'string') { data. = }
+
+        const id = data.update_bouquet_id;
+
+        // Redirect the user to the update page
+        res.render('bouquets_edit', {id:id})
+    } catch (error) {
+        console.error('Error executing queries:', error);
+        // Send a generic error message to the browser
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+app.post('/bouqets/update', async function (req, res) {
+    try {
+        //Process data (access and sanitize)
+        const data = req.body;
+        // console.log(`FData: ${JSON.stringify(data)}`)
+        // if (typeof data !== 'string') { data. = }
+
+        const update_query = 'CALL sp_update_flower(?, ?, ?, ?);';
+        await db.query(update_query, [
+            data.create_bouquet_id,
+            data.create_bouquet_description,
+            data.create_maker_id,
+            data.create_recipient_id,
+        ]);
+
+        // Redirect the user to the updated webpage data
+        res.redirect('/bouquets');
+    } catch (error) {
+        console.error('Error executing queries:', error);
+        // Send a generic error message to the browser
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+// ############################# DELETE BOUQUET REQUEST ############################
+app.post('/bouquets/delete', async function (req, res) {
+    try {
+        // Get input from form and apply to request
+        let data = req.body;
+        console.log(`Delete Body: ${JSON.stringify(data)}`)
+
+        // Create/execute parameterized query
+        const query_sp_delete_bouquet = `CALL sp_delete_bouquet(?);`;
+        await db.query(query_sp_delete_bouquet, [data.delete_bouquet_id]);
+
+        // Log the bouquet id and name being deleted
+        console.log(`DELETE from BOUQUETS: Row: ${data.delete_bouquet_id}, Name: ${data.delete_bouquet_name}`);
+
+        // Redirect the user to the updated webpage data
+        res.redirect('/bouquets');
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser

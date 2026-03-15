@@ -97,7 +97,7 @@ BEGIN
          'Thorne', 'hawthorne@gmail.com'),
         ('Yara', 'Coulibaly', '5319857942',
          'CoolYara', 'coulibaly_yara@mail.com'),
-        ('Anderson', 'Wren', '888548319', 'TheOneTrueKing', NULL);
+        ('Anderson', 'Wren', '8885483191', 'TheOneTrueKing', NULL);
 
     INSERT INTO RECIPIENTS (FNAME, LNAME, PHONE, HANDLE, EMAIL)
     VALUES

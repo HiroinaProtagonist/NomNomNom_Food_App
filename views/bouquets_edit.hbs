@@ -1,0 +1,49 @@
+<!--Citation for the following code-->
+<!--Adapted from Web Application Technology exploration and Step 4 Draft starter code-->
+<!--(https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419-->
+<!--Changes made beyond the starter code are our own without reference to AI-->
+
+<h1>Bouquets</h1>
+
+{{! UPDATE form }}
+<h2>Update a Bouquet</h2>
+<form class='cuForm' id='update_bouquet_id_form' method='POST' action='/bouquets/update'>
+    <label for='update_bouquet_id'>Bouquet to Update: </label>
+    <select name='update_bouquet_id' id='update_bouquet_id' required>
+        <option value='' disabled selected>Bouquet</option>
+        {{#each bouquets}}
+            <option value='{{this.bouquet_ID}}' required>
+                {{this.bouquet_ID}}
+            </option>
+        {{/each}}
+    </select>
+    <br/>
+    <label for='update_bouquet_name'>Name: </label>
+    <input type='text' name='update_bouquet_name' id='update_bouquet_name' required />
+
+    <label for='update_maker_id'>Maker: </label>
+    <select name='update_maker_id' id='update_maker_id'>
+        <option value='NULL' disabled selected>Select a Maker</option>
+        {{#each maker}}
+            <option value='{{this.MAKER_ID}}' required>{{this.MAKER}}</option>
+        {{/each}}
+    </select>
+    <br/>
+
+    <label for='update_maker_flowers'>Flowers: </label>
+    <select name='update_maker_flowers' id='update_maker_flowers'>
+        <option value='NULL' disabled selected>Select Flowers</option>
+        {{#each flower}}
+            <option value='{{this.FLOWER_ID}}' required>{{this.FLOWER}}</option>
+        {{/each}}
+    </select>
+
+    <label for='update_recipient_id'>Recipient: </label>
+    <select name='update_recipient_id' id='update_recipient_id'>
+        <option value='NULL' disabled selected>Select a Recipient</option>
+        {{#each recipient}}
+            <option value='{{this.RECIPIENT_ID}}' required>{{this.RECIPIENT}}</option>
+        {{/each}}
+    </select>
+    <input type='submit' />
+</form>

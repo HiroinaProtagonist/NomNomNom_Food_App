@@ -78,3 +78,92 @@ BEGIN
     SELECT 'Flower successfully deleted' AS Result;
 END //
 DELIMITER ;
+
+------------------------------------------------------------------------------------
+-- To create/insert into the BOUQUET table
+DROP PROCEDURE IF EXISTS sp_create_bouquet;
+DELIMITER //
+CREATE PROCEDURE sp_create_bouquet(
+    IN in_bouquet_name VARCHAR(50),
+    IN in_bouquet_description VARCHAR(50),
+    IN in_maker_id INT,
+    IN in_recipient_id INT,
+    OUT out_bouquet_id INT)
+BEGIN
+INSERT INTO BOUQUETS (NAME, DESCRIPTION, MAKER_ID, RECIPIENT_ID)
+VALUES (in_bouquet_name, in_bouquet_description, in_maker_id, in_recipient_id );
+
+-- Store the ID of the last inserted row
+SELECT LAST_INSERT_ID() into out_bouquet_id;
+
+-- Display the ID of the last inserted bouquet.
+SELECT LAST_INSERT_ID() AS 'New bouquet inserted: ';
+END //
+DELIMITER ;
+
+-- To add a flower to the BOUQUET table
+DROP PROCEDURE IF EXISTS sp_add_ftob;
+DELIMITER //
+CREATE PROCEDURE sp_add_ftob(
+    IN in_flower_id INT,
+    IN in_bouquet_id INT,
+    OUT out_bouquet_id INT)
+BEGIN
+    INSERT INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
+    VALUES (in_flower_id, in_bouquet_id );
+
+    -- Store the ID of the last inserted row
+    SELECT LAST_INSERT_ID() into out_bouquet_id;
+
+    -- Display the ID of the last inserted bouquet.
+    SELECT LAST_INSERT_ID() AS 'New bouquet inserted: ';
+END //
+DELIMITER ;
+
+-- To update from the BOUQUET table
+DROP PROCEDURE IF EXISTS sp_update_bouquet;
+DELIMITER //
+CREATE PROCEDURE sp_update_bouquet(
+    IN in_bouquet_name VARCHAR(50),
+    IN in_bouquet_description VARCHAR(50),
+    IN in_maker_id INT,
+    IN in_recipient_id INT)
+BEGIN
+UPDATE BOUQUET AS B
+SET B.NAME=in_bouquet_name, B.DESCRIPTION=in_bouquet_description,
+    B.MAKER_ID=in_maker_id, B.RECIPIENT_ID=in_recipient_id
+WHERE F.BOUQUET_ID=in_bouquet_id;
+
+END //
+DELIMITER ;
+
+-- To delete from the BOUQUET table
+DROP PROCEDURE IF EXISTS sp_delete_bouquet;
+DELIMITER //
+CREATE PROCEDURE sp_delete_bouquet(IN in_bouquet_id INT)
+BEGIN
+    DECLARE error_message VARCHAR(255);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        -- Rollback if failure in any statement and show failure message
+        ROLLBACK;
+        SELECT 'Error. Rollback triggered.' AS Result;
+    END;
+
+    -- Initiate transaction
+    START TRANSACTION;
+        DELETE FROM BOUQUETS WHERE BOUQUET_ID = in_bouquet_id;
+
+        -- ROW_COUNT() returns the number of rows affected by the preceding statement.
+        IF ROW_COUNT() = 0 THEN
+            set error_message = CONCAT('No matching record found for id: ', in_bouquet_id);
+
+            -- Trigger custom error, invoke EXIT HANDLER
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
+        END IF;
+
+    -- Commit transaction and show success message
+    COMMIT;
+    SELECT 'Bouquet successfully deleted' AS Result;
+END //
+DELIMITER ;
