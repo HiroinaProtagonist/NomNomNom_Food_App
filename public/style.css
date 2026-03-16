@@ -1,14 +1,73 @@
-h1, h2, h3, h4, h5, h6 { margin-left: 16px;}
-table {border-collapse: collapse;margin-left: 32px;}
+/*#left_bouquet_form {*/
+/*    clear: right;*/
+/*    text-align: left;*/
+/*    border: thin dotted darkmagenta;*/
+/*    height: 100px;*/
+/*}*/
+
+/*label {*/
+/*    padding-right: 50px;*/
+/*}*/
+
+/*#right_bouquet_form {*/
+/*    clear: none;*/
+/*    vertical-align: top;*/
+/*    border: thin dotted darkmagenta;*/
+/*    align: right;*/
+/*}*/
+
+h1, h2, h3, h4, h5, h6 {
+    margin-left: 16px;
+}
+
+table {
+    border-collapse: collapse;
+    margin-left: 32px;
+}
+
 th, td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: center;
 }
-th {background-color: #f2f2f2;}
-tr:nth-child(even) {background-color: #f9f9f9;}
-.cuForm { margin-left: 32px;}
-input, select { margin-bottom: 4px;margin-right: 12px;}
-nav {background-color: #cecece;padding: 16px;}
-a {margin-left: 16px;}
-.homepageDescription {margin-left: 32px;}
+
+#create_bouquet_form_table {
+    padding-left: 0px;
+    margin-left: 0px;
+}
+
+#create_bouquet_name, #create_bouquet_description, #create_maker_id, #create_recipient_id {
+    padding-left: 0px;
+    padding-right: 20px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.cuForm {
+    margin-left: 32px;
+}
+
+input, select {
+    margin-bottom: 4px;
+    margin-right: 12px;
+}
+
+nav {
+    background-color: #cecece;
+    padding: 16px;
+}
+
+a {
+    margin-left: 16px;
+}
+
+.homepageDescription {
+    margin-left: 32px;
+}
+

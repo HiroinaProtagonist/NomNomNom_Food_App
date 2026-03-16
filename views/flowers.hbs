@@ -17,6 +17,7 @@
             </th>
             {{/each}}
             <th></th>
+            <th></th>
         </tr>
     </thead>
 
@@ -28,6 +29,19 @@
             <td>{{this.NAME}}</td>
             <td>{{this.MEANING}}</td>
             <td>{{this.COLOR}}</td>
+
+            {{! UPDATE form }}
+            <form id='update_flower_form' METHOD='POST' action='/flower_edit'>
+                <input type='hidden' name='update_flower_id' value='{{this.FLOWER_ID}}'/>
+                <input type='hidden' name='update_flower_name' value='{{this.NAME}}' />
+                <input type='hidden' name='update_flower_meaning' value='{{this.MEANING}}' />
+                <input type='hidden' name='update_flower_color' value='{{this.COLOR}}' />
+                <td>
+                    <button type='submit'>
+                        Edit
+                    </button>
+                </td>
+            </form>
 
             {{! DELETE form }}
             <form id='delete_flower_form' METHOD='POST' action='/flowers/delete'>

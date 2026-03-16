@@ -57,7 +57,7 @@ BEGIN
     DECLARE error_message VARCHAR(255);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
-            -- Rollback if failure in any statement and show failure message
+        -- Rollback if failure in any statement and show failure message
         ROLLBACK;
         SELECT 'Error. Rollback triggered.' AS Result;
     END;
@@ -81,42 +81,57 @@ DELIMITER ;
 
 ------------------------------------------------------------------------------------
 -- To create/insert into the BOUQUET table
+
+-- https://www.geeksforgeeks.org/sql/mysql-while-loop/
 DROP PROCEDURE IF EXISTS sp_create_bouquet;
 DELIMITER //
 CREATE PROCEDURE sp_create_bouquet(
+    IN in_flower_count INT,
+    IN in_flower_id INT,
     IN in_bouquet_name VARCHAR(50),
     IN in_bouquet_description VARCHAR(50),
     IN in_maker_id INT,
     IN in_recipient_id INT,
     OUT out_bouquet_id INT)
 BEGIN
-INSERT INTO BOUQUETS (NAME, DESCRIPTION, MAKER_ID, RECIPIENT_ID)
-VALUES (in_bouquet_name, in_bouquet_description, in_maker_id, in_recipient_id );
+--     DECLARE created INT;
+    DECLARE num_flowers;
+    SET num_flowers = in_flower_count;
+    DECLARE error_message VARCHAR(255);
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error. Rollback triggered.' AS Result;
+    END;
+    START TRANSACTION;
+        INSERT INTO BOUQUETS (NAME, DESCRIPTION, MAKER_ID, RECIPIENT_ID)
+        VALUES (in_bouquet_name, in_bouquet_description, in_maker_id, in_recipient_id );
 
--- Store the ID of the last inserted row
-SELECT LAST_INSERT_ID() into out_bouquet_id;
+        -- Store the ID of the last inserted row
+        SELECT LAST_INSERT_ID() into out_bouquet_id;
+--         SELECT LAST_INSERT_ID() into created;
 
--- Display the ID of the last inserted bouquet.
-SELECT LAST_INSERT_ID() AS 'New bouquet inserted: ';
+        -- Display the ID of the last inserted bouquet.
+        SELECT LAST_INSERT_ID() AS 'created_id';
+
+        label:
+             WHILE num_flowers > 0 DO
+                INSERT INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
+                VALUES (in_flower_id, out_bouquet_id);
+    COMMIT;
+    SELECT 'Bouquet successfully updated' AS Result;
 END //
 DELIMITER ;
 
--- To add a flower to the BOUQUET table
+-- To add flowers to the FLOWERS_BOUQUETS intersection table
 DROP PROCEDURE IF EXISTS sp_add_ftob;
 DELIMITER //
 CREATE PROCEDURE sp_add_ftob(
     IN in_flower_id INT,
-    IN in_bouquet_id INT,
-    OUT out_bouquet_id INT)
+    IN in_bouquet_id INT)
 BEGIN
     INSERT INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
     VALUES (in_flower_id, in_bouquet_id );
-
-    -- Store the ID of the last inserted row
-    SELECT LAST_INSERT_ID() into out_bouquet_id;
-
-    -- Display the ID of the last inserted bouquet.
-    SELECT LAST_INSERT_ID() AS 'New bouquet inserted: ';
 END //
 DELIMITER ;
 

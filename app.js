@@ -195,7 +195,7 @@ app.post('/flowers/create',
 
         console.log("Data: " + JSON.stringify(data));
         // Safely call SP for create and get row created (last inserted)
-        const create_flower_query = `CALL sp_create_flower(?, ?, ?, @created_id);`;
+        const create_flower_query = `CALL sp_create_flower(?, ?, ?, ?, ?, @created_id);`;
         await db.query(create_flower_query, [
             data.create_flower_name,
             data.create_flower_meaning,
@@ -274,25 +274,52 @@ app.post('/bouquets/create',
             console.log("Data: " + JSON.stringify(data));
 
             // Safely call SP for create and get row created (last inserted)
-            const create_bouquet_query = `CALL sp_create_bouquet(?, ?, ?, ?, @created_id);`;
-            const created_id = await db.query(create_bouquet_query, [
+            const create_bouquet_query = `CALL sp_create_bouquet(?, ?, ?, ?, ?, @created_id);`;
+            const [[[db_results]]] = await db.query(create_bouquet_query, [
+                data.create_bouquet_flowers[0],
                 data.create_bouquet_name,
                 data.create_bouquet_description,
                 data.create_maker_id,
                 data.create_recipient_id,
             ]);
 
-            console.log("Created: " + JSON.stringify(created_id));
+            let b_id_created = db_results.created_id;
+            let flowers = data.create_bouquet_flowers;
+            console.log(JSON.stringify(flowers));
+
+            // console.log("Created: " + JSON.stringify(db_results.created_id));
+
+            const flower_query = 'CALL sp_add_ftob(?, ?);';
 
             //Add selected flowers to bouquet
-            for (flower in data.add_bouquet_flowers) {
-                const flower_query = 'CALL sp_add_ftob(?, ?);';
-                await db.query(flower_query, [
-                    flower,
-                    data.created_id
-                ]);
-            }
+            //This should be safe because await, but this can't be a good idea
+            //TODO Optimize this by adding WHILE loop to SP
+            // if (typeof flowers !== 'undefined' && flowers.length > 0) {
+            //     // flowers.forEach(async (flower, b_id_created) => {
+            //         console.log("Flower: " + flowers[0] + ", Bouquet: " + b_id_created);
+            //
+            //         await db.query(flower_query, [
+            //             flowers[0],
+            //             db_results.created_id
+            //         ]);
+            //
+            //     console.log("Flower: " + flowers[1] + ", Bouquet: " + b_id_created);
+            //     await db.query(flower_query, [
+            //         flowers[1],
+            //         db_results.created_id
+            //     ]);
+            //     // });
+            // }
 
+            // for (const flower of flowers) {
+            //     const flower_query = `CALL sp_add_ftob(?, ?);`;
+            //     await db.query(flower_query, [
+            //         flower,
+            //         b_id_created
+            //     ]);
+            // }
+
+            console.log("Added flowers");
             // Redirect the user to the updated webpage
             res.redirect('/bouquets');
         } catch (error) {
@@ -304,7 +331,7 @@ app.post('/bouquets/create',
         }
     });
 
-// ############################# UPDATE FLOWER REQUEST ############################
+// ############################# UPDATE BOUQUET FORM ############################
 app.post('/bouquet_edit', async function (req, res) {
     try {
         //Process data (access and sanitize)
@@ -314,8 +341,26 @@ app.post('/bouquet_edit', async function (req, res) {
 
         const id = data.update_bouquet_id;
 
+        // Create and execute queries
+        // const bouquet_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_single.sql'), 'utf8');
+        // const [bouquet_fields] = await db.query(bouquet_query);
+
+        const bouquets_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
+        const [bouquets_fields] = await db.query(bouquets_query);
+        // console.log(JSON.stringify(bouquet));
+
+        const maker_query = fs.readFileSync(path.join(__dirname, 'queries', 'makers.sql'), 'utf8');
+        const [makers_fields] = await db.query(maker_query);
+
+        const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
+        const [flowers_fields] = await db.query(flower_query);
+        // console.log(`Color: ${JSON.stringify(color)}`);
+
+        const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
+        const [recipients_fields] = await db.query(recipient_query);
+
         // Redirect the user to the update page
-        res.render('bouquets_edit', {id:id})
+        res.render('bouquets_edit', {bouquets: bouquets_fields, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -325,6 +370,7 @@ app.post('/bouquet_edit', async function (req, res) {
     }
 });
 
+// ############################# UPDATE BOUQUET DATABASE CALL AND REDIRECT ############################
 app.post('/bouqets/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
