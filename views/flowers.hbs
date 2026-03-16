@@ -9,21 +9,21 @@
 {{! READ table }}
 <table>
     <thead>
-        {{! HEADERS }}
-        <tr>
-            {{#each flower.[0]}}
+    {{! HEADERS }}
+    <tr>
+        {{#each flower.[0]}}
             <th>
                 {{@key}}
             </th>
-            {{/each}}
-            <th></th>
-            <th></th>
-        </tr>
+        {{/each}}
+        <th></th>
+        <th></th>
+    </tr>
     </thead>
 
     <tbody>
-        {{! FIELDS }}
-        {{#each flower}}
+    {{! FIELDS }}
+    {{#each flower}}
         <tr>
             <td>{{this.FLOWER_ID}}</td>
             <td>{{this.NAME}}</td>
@@ -33,9 +33,9 @@
             {{! UPDATE form }}
             <form id='update_flower_form' METHOD='POST' action='/flower_edit'>
                 <input type='hidden' name='update_flower_id' value='{{this.FLOWER_ID}}'/>
-                <input type='hidden' name='update_flower_name' value='{{this.NAME}}' />
-                <input type='hidden' name='update_flower_meaning' value='{{this.MEANING}}' />
-                <input type='hidden' name='update_flower_color' value='{{this.COLOR}}' />
+                <input type='hidden' name='update_flower_name' value='{{this.NAME}}'/>
+                <input type='hidden' name='update_flower_meaning' value='{{this.MEANING}}'/>
+                <input type='hidden' name='update_flower_color' value='{{this.COLOR}}'/>
                 <td>
                     <button type='submit'>
                         Edit
@@ -45,8 +45,8 @@
 
             {{! DELETE form }}
             <form id='delete_flower_form' METHOD='POST' action='/flowers/delete'>
-                <input type='hidden' name='delete_flower_id' value='{{this.FLOWER_ID}}' />
-                <input type='hidden' name='delete_flower_name' value='{{this.NAME}}' />
+                <input type='hidden' name='delete_flower_id' value='{{this.FLOWER_ID}}'/>
+                <input type='hidden' name='delete_flower_name' value='{{this.NAME}}'/>
                 <td>
                     <button type='submit'>
                         Delete
@@ -54,61 +54,23 @@
                 </td>
             </form>
         </tr>
-        {{/each}}
+    {{/each}}
+
+    <tr ><td colspan='7'>&nbsp;</td></tr>
+
+    <form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
+        <tr>
+            <td>Add New</td>
+            <td><input type='text' name='create_flower_name' id='create_flower_name' required/></td>
+            <td><input type='text' name='create_flower_meaning' id='create_flower_meaning' required/></td>
+            <td><select name='create_color_id' id='create_color_id'>
+                <option value='NULL' disabled selected>Select a Color</option>
+                {{#each color}}
+                    <option value='{{this.COLOR_ID}}' required>{{this.COLOR}}</option>
+                {{/each}}
+            </select></td>
+            <td colspan="2"><input type='submit'/></td>
+        </tr>
+    </form>
     </tbody>
 </table>
-
-{{! CREATE form }}
-</br>
-<h2>Create a New Flower</h2>
-<form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
-    <label for='create_flower_name'>Name: </label>
-    <input type='text' name='create_flower_name' id='create_flower_name' required />
-
-    <label for='create_flower_meaning'>Meaning: </label>
-    <input type='text' name='create_flower_meaning' id='create_flower_meaning' required />
-
-    <label for='create_color_id'>Color: </label>
-    <select name='create_color_id' id='create_color_id'>
-        <option value='NULL' disabled selected>Select a Color</option>
-        {{#each color}}
-            <option value='{{this.COLOR_ID}}' required>{{this.COLOR}}</option>
-        {{/each}}
-    </select>
-    <input type='submit' />
-</form>
-
-</br><br/>
-{{! UPDATE form }}
-<h2>Update a Flower</h2>
-<form class='cuForm' id='update_flower_form' METHOD='POST' action='/flowers/update'>
-    <label for='update_select_flower_id'>Flower to Update: </label>
-    <select name='update_select_flower_id' id='update_select_flower_id' required>
-        <option value='' disabled selected>Select a Flower</option>
-        {{#each flower}}
-        <option value='{{this.FLOWER_ID}}' required>
-            {{this.FLOWER_ID}}: {{this.NAME}}
-        </option>
-        {{/each}}
-    </select>
-
-    <br/>
-
-    <label for='update_flower_name'>Name: </label>
-    <input type="text" name='update_flower_name' id='update_flower_name' value='{{update_flower_name}}'>
-
-    <label for='update_flower_meaning'>Meaning: </label>
-    <input type="text" name='update_flower_meaning' id='update_flower_meaning' value='{{update_flower_meaning}}'>
-
-    <label for='update_color_id'>Color: </label>
-    <select name='update_color_id' id='update_color_id'>
-        <option value='NULL' disabled selected>Select a Color</option>
-        {{#each color}}
-            <option value='{{this.COLOR_ID}}' required>
-                {{this.COLOR}}
-            </option>
-        {{/each}}
-    </select>
-
-    <input type='submit' />
-</form>

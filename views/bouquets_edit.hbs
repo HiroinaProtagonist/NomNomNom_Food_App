@@ -6,36 +6,21 @@
 <h1>Bouquets</h1>
 
 {{! UPDATE form }}
-<h2>Update a Bouquet</h2>
+<h2>Edit a Bouquet</h2>
 <form class='cuForm' id='update_bouquet_form' METHOD='POST' action='/bouquets/update'>
     <table id="update_bouquet_form_table">
         <tr>
             <!--    <td>-->
             <!--    <span id="left_bouquet_form">-->
             <td><label for='update_bouquet_name'>Name: </label></td>
-            <td><input type='text' name='update_bouquet_name' id='update_bouquet_name' required/><br/></td>
-            <!--    </tr>-->
-            <!--        <tr>-->
-            <td rowspan="4">
-                <!--    </span>-->
-                <!--    <span id="right_bouquet_form"><br/>-->
-                <label for='update_bouquet_flowers'>Flowers: </label>
-                <br/></td>
-            <td rowspan="4">
-
-                <select name='update_bouquet_flowers' id='update_bouquet_flowers' multiple>
-                    <option value='NULL' disabled selected>Select Flowers</option>
-                    {{#each flowers}}
-                        <option value='{{this.FLOWER_ID}}' required>{{this.FLOWER_ID}}
-                            : {{this.COLOR}} {{this.NAME}}</option>
-                    {{/each}}
-                </select>
-                <!--    </span>-->
+            <td><input type='text' name='update_bouquet_name'
+                       id='update_bouquet_name' value='{{data.update_bouquet_name}}' required/><br/>
             </td>
 
         <tr>
             <td><label for='update_bouquet_description'>Description: </label></td>
-            <td><input type='text' name='update_bouquet_description' id='update_bouquet_description' required/>
+            <td><input type='text' name='update_bouquet_description'
+                       id='update_bouquet_description' value='{{data.update_bouquet_description}}' required/>
                 <br/></td>
         </tr>
         <tr>
@@ -60,5 +45,37 @@
         </tr>
     </table>
     <br/>
+
+    <table>
+        <tr>
+            <td>
+                <label for='update_bouquet_flowers'>Flowers: </label>
+<!--                Flowers:-->
+            </td>
+        </tr>
+        <tr>
+<!--            <td rowspan="4">-->
+                <!--    </span>-->
+                <!--    <span id="right_bouquet_form"><br/>-->
+<!--                <label for='update_bouquet_flowers'>Flowers: </label>-->
+<!--                <br/>-->
+<!--            </td>-->
+            <td>
+                <select name='update_bouquet_flowers' id='update_bouquet_flowers' required multiple>
+                    <option value='NULL' disabled selected>Select Flowers</option>
+                    {{#each flowers}}
+                        <option value='{{this.FLOWER_ID}}'>{{this.FLOWER_ID}}
+                            : {{this.COLOR}} {{this.NAME}}</option>
+                    {{/each}}
+                </select>
+                <!--    </span>-->
+            </td>
+
+        </tr>
+    </table>
+    <input type='hidden' name='update_select_bouquet_id' value='{{data.update_bouquet_id}}'/>
     <input type='submit'/>
 </form>
+
+
+

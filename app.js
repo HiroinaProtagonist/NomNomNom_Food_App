@@ -195,7 +195,7 @@ app.post('/flowers/create',
 
         console.log("Data: " + JSON.stringify(data));
         // Safely call SP for create and get row created (last inserted)
-        const create_flower_query = `CALL sp_create_flower(?, ?, ?, ?, ?, @created_id);`;
+        const create_flower_query = `CALL sp_create_flower(?, ?, ?, @created_id);`;
         await db.query(create_flower_query, [
             data.create_flower_name,
             data.create_flower_meaning,
@@ -213,12 +213,36 @@ app.post('/flowers/create',
     }
 });
 
-// ############################# UPDATE FLOWER REQUEST ############################
+// ############################# UPDATE FLOWER FORM ############################
+app.post('/flower_edit', async function (req, res) {
+    try {
+        //Process data (access and sanitize)
+        const data = req.body;
+        console.log(`Redirect Data: ${JSON.stringify(data)}`)
+        // if (typeof data !== 'string') { data. = }
+
+        // Create and execute queries
+        const color_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
+        const [colors_fields] = await db.query(color_query);
+        // console.log(`Color: ${JSON.stringify(color)}`);
+
+        // Redirect the user to the update page
+        res.render('flowers_edit', {data: data, colors: colors_fields});
+    } catch (error) {
+        console.error('Error executing queries:', error);
+        // Send a generic error message to the browser
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+// ############################# UPDATE FLOWER DATABASE CALL AND REDIRECT ############################
 app.post('/flowers/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        // console.log(`FData: ${JSON.stringify(data)}`)
+        console.log(`FData: ${JSON.stringify(data)}`)
         // if (typeof data !== 'string') { data. = }
 
         const update_query = 'CALL sp_update_flower(?, ?, ?, ?);';
@@ -226,7 +250,7 @@ app.post('/flowers/update', async function (req, res) {
             data.update_select_flower_id,
             data.update_flower_name,
             data.update_flower_meaning,
-            data.update_color_id,
+            data.update_flower_color,
         ]);
 
         // Redirect the user to the updated webpage data
@@ -274,9 +298,8 @@ app.post('/bouquets/create',
             console.log("Data: " + JSON.stringify(data));
 
             // Safely call SP for create and get row created (last inserted)
-            const create_bouquet_query = `CALL sp_create_bouquet(?, ?, ?, ?, ?, @created_id);`;
+            const create_bouquet_query = `CALL sp_create_bouquet(?, ?, ?, ?, @created_id);`;
             const [[[db_results]]] = await db.query(create_bouquet_query, [
-                data.create_bouquet_flowers[0],
                 data.create_bouquet_name,
                 data.create_bouquet_description,
                 data.create_maker_id,
@@ -285,41 +308,49 @@ app.post('/bouquets/create',
 
             let b_id_created = db_results.created_id;
             let flowers = data.create_bouquet_flowers;
-            console.log(JSON.stringify(flowers));
+            // console.log(JSON.stringify(flowers));
 
             // console.log("Created: " + JSON.stringify(db_results.created_id));
 
-            const flower_query = 'CALL sp_add_ftob(?, ?);';
+            // const flower_query = 'CALL sp_add_ftob(?, ?);';
 
             //Add selected flowers to bouquet
             //This should be safe because await, but this can't be a good idea
-            //TODO Optimize this by adding WHILE loop to SP
-            // if (typeof flowers !== 'undefined' && flowers.length > 0) {
-            //     // flowers.forEach(async (flower, b_id_created) => {
-            //         console.log("Flower: " + flowers[0] + ", Bouquet: " + b_id_created);
-            //
-            //         await db.query(flower_query, [
-            //             flowers[0],
-            //             db_results.created_id
-            //         ]);
-            //
-            //     console.log("Flower: " + flowers[1] + ", Bouquet: " + b_id_created);
-            //     await db.query(flower_query, [
-            //         flowers[1],
-            //         db_results.created_id
-            //     ]);
-            //     // });
-            // }
+            //It's not a good idea, change this to use Promise.all
+            // Refs for citation:
+            // https://stackoverflow.com/questions/54153347/how-does-array-foreach-handle-async-functions
+            // https://stackoverflow.com/questions/43057807/using-promise-all-on-the-entries-of-a-map
 
-            // for (const flower of flowers) {
-            //     const flower_query = `CALL sp_add_ftob(?, ?);`;
-            //     await db.query(flower_query, [
-            //         flower,
-            //         b_id_created
-            //     ]);
-            // }
+            // TODO Optimize this by adding WHILE loop to SP
+            // https://www.geeksforgeeks.org/sql/mysql-while-loop/
+            // https://dev.mysql.com/doc/refman/8.4/en/json-attribute-functions.html
+            if (typeof flowers !== 'undefined' && flowers.length > 0) {
+                //     // flowers.forEach(async (flower, b_id_created) => {
+                //         console.log("Flower: " + flowers[0] + ", Bouquet: " + b_id_created);
+                //
+                //         await db.query(flower_query, [
+                //             flowers[0],
+                //             db_results.created_id
+                //         ]);
+                //
+                //     console.log("Flower: " + flowers[1] + ", Bouquet: " + b_id_created);
+                //     await db.query(flower_query, [
+                //         flowers[1],
+                //         db_results.created_id
+                //     ]);
+                //     // });
+                // }
 
-            console.log("Added flowers");
+                for (const flower of flowers) {
+                    const flower_query = `CALL sp_add_ftob(?, ?);`;
+                    await db.query(flower_query, [
+                        flower,
+                        b_id_created
+                    ]);
+                }
+            }
+
+            // console.log("Added flowers");
             // Redirect the user to the updated webpage
             res.redirect('/bouquets');
         } catch (error) {
@@ -339,12 +370,6 @@ app.post('/bouquet_edit', async function (req, res) {
         console.log(`Redirect Data: ${JSON.stringify(data)}`)
         // if (typeof data !== 'string') { data. = }
 
-        const id = data.update_bouquet_id;
-
-        // Create and execute queries
-        // const bouquet_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_single.sql'), 'utf8');
-        // const [bouquet_fields] = await db.query(bouquet_query);
-
         const bouquets_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
         const [bouquets_fields] = await db.query(bouquets_query);
         // console.log(JSON.stringify(bouquet));
@@ -360,7 +385,7 @@ app.post('/bouquet_edit', async function (req, res) {
         const [recipients_fields] = await db.query(recipient_query);
 
         // Redirect the user to the update page
-        res.render('bouquets_edit', {bouquets: bouquets_fields, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields});
+        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -371,19 +396,19 @@ app.post('/bouquet_edit', async function (req, res) {
 });
 
 // ############################# UPDATE BOUQUET DATABASE CALL AND REDIRECT ############################
-app.post('/bouqets/update', async function (req, res) {
+app.post('/bouquets/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        // console.log(`FData: ${JSON.stringify(data)}`)
-        // if (typeof data !== 'string') { data. = }
+        console.log(`Redirected Data: ${JSON.stringify(data)}`)
 
-        const update_query = 'CALL sp_update_flower(?, ?, ?, ?);';
+        const update_query = 'CALL sp_update_bouquet(?, ?, ?, ?, ?);';
         await db.query(update_query, [
-            data.create_bouquet_id,
-            data.create_bouquet_description,
-            data.create_maker_id,
-            data.create_recipient_id,
+            data.update_select_bouquet_id,
+            data.update_bouquet_name,
+            data.update_bouquet_description,
+            data.update_maker_id,
+            data.update_recipient_id,
         ]);
 
         // Redirect the user to the updated webpage data

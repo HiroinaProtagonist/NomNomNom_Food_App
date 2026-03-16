@@ -80,10 +80,30 @@ END //
 DELIMITER ;
 
 ------------------------------------------------------------------------------------
--- To create/insert into the BOUQUET table
-
--- https://www.geeksforgeeks.org/sql/mysql-while-loop/
+-- To create/insert into the BOUQUETS table
 DROP PROCEDURE IF EXISTS sp_create_bouquet;
+DELIMITER //
+CREATE PROCEDURE sp_create_bouquet(
+    IN in_bouquet_name VARCHAR(50),
+    IN in_bouquet_description VARCHAR(50),
+    IN in_maker_id INT,
+    IN in_recipient_id INT,
+    OUT out_flower_id INT)
+BEGIN
+    INSERT INTO BOUQUETS (NAME, DESCRIPTION, MAKER_ID, RECIPIENT_ID)
+    VALUES (in_bouquet_name, in_bouquet_description, in_maker_id, in_recipient_id );
+
+    -- Store the ID of the last inserted row
+    SELECT LAST_INSERT_ID() into out_flower_id;
+
+-- Display the ID of the last inserted flower.
+SELECT LAST_INSERT_ID() AS 'New flower inserted: ';
+END //
+DELIMITER ;
+
+-- To create/insert into the BOUQUET table with flowers
+-- https://www.geeksforgeeks.org/sql/mysql-while-loop/
+DROP PROCEDURE IF EXISTS sp_create_with_flowers_bouquet;
 DELIMITER //
 CREATE PROCEDURE sp_create_bouquet(
     IN in_flower_count INT,
@@ -139,15 +159,16 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_update_bouquet;
 DELIMITER //
 CREATE PROCEDURE sp_update_bouquet(
+    IN in_bouquet_id INT,
     IN in_bouquet_name VARCHAR(50),
     IN in_bouquet_description VARCHAR(50),
     IN in_maker_id INT,
     IN in_recipient_id INT)
 BEGIN
-UPDATE BOUQUET AS B
+UPDATE BOUQUETS AS B
 SET B.NAME=in_bouquet_name, B.DESCRIPTION=in_bouquet_description,
     B.MAKER_ID=in_maker_id, B.RECIPIENT_ID=in_recipient_id
-WHERE F.BOUQUET_ID=in_bouquet_id;
+WHERE B.BOUQUET_ID=in_bouquet_id;
 
 END //
 DELIMITER ;
