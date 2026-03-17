@@ -10,31 +10,37 @@
 <form class='cuForm' id='update_flower_form' METHOD='POST' action='/flowers/update'>
     <table id="update_flower_form_table">
         <tr>
-            <!--    <td>-->
-            <!--    <span id="left_flower_form">-->
             <td><label for='update_flower_name'>Name: </label></td>
             <td><input type='text' name='update_flower_name'
                        id='update_flower_name' value='{{data.update_flower_name}}' required/><br/></td>
-            <td rowspan="2">
-                <select name='update_flower_color' id='update_flower_color'>
-                    <option value='NULL' disabled>Select Color</option>
-                    {{#each colors}}
-                        <option value='{{this.COLOR_ID}}' required>{{this.COLOR_ID}}: {{this.COLOR}}
-
-                        </option>
-                    {{/each}}
-                </select>
-                <!--    </span>-->
-            </td>
+            <td><label for='update_flower_color'>Color: </label></td>
         </tr>
 
         <tr>
             <td><label for='update_flower_description'>Description: </label></td>
             <td><input type='text' name='update_flower_meaning'
                        id='update_flower_meaning' value='{{data.update_flower_meaning}}' required/><br/></td>
+            <td>
+                <select name='update_flower_color' id='update_flower_color'>
+                    <option value='NULL' disabled>Select Color</option>
+                    {{#each colors}}
+                        <option
+                                value='{{this.COLOR_ID}}' required>{{this.COLOR_ID}}: {{this.COLOR}}
+                                if data.up
+
+                        </option>
+                    {{/each}}
+                </select>
+            </td>
+        </tr>
+
+        <tr colspan="3"></tr>
+
+        <tr>
+            <td colspan="2"></td>
+            <td><input type='submit'/></td>
         </tr>
     </table>
     <br/>
     <input type='hidden' name='update_select_flower_id' value='{{data.update_flower_id}}' />
-    <input type='submit'/>
 </form>
