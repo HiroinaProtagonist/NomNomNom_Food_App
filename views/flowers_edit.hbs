@@ -24,11 +24,11 @@
                 <select name='update_flower_color' id='update_flower_color'>
                     <option value='NULL' disabled>Select Color</option>
                     {{#each colors}}
-                        <option
-                                value='{{this.COLOR_ID}}' required>{{this.COLOR_ID}}: {{this.COLOR}}
-                                if data.up
-
-                        </option>
+                        <option value='{{this.COLOR_ID}}'
+                            {{#if (shouldBeSelected this.COLOR data.update_flower_color)}}
+                                selected
+                            {{/if}}
+                        required>{{this.COLOR_ID}}: {{this.COLOR}}</option>
                     {{/each}}
                 </select>
             </td>

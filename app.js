@@ -9,6 +9,7 @@
 // Changes made beyond the starter code are our own without reference to AI
 
 // ######################## SETUP ########################
+//.env
 require('dotenv').config();
 
 // Express
@@ -28,9 +29,24 @@ const PORT = 9199;
 const db = require('./database/db-connector');
 
 // Handlebars
-const { engine } = require('express-handlebars'); // Import express-handlebars engine
-app.engine('.hbs', engine({ extname: '.hbs' })); // Create instance of handlebars
+// Citation - code to populate selected field adapted from source url:
+// Source url: https://www.npmjs.com/package/express-handlebars
+const { engine, create } = require('express-handlebars'); // Import express-handlebars engine
+const hbs = create({
+    helpers: {
+        shouldBeSelected(stringa, stringb){
+            if (stringa === stringb) {
+                {{'selected'}};
+            }
+        }
+    }
+});
+
+app.engine('.hbs', engine({
+    extname: '.hbs'
+})); // Create instance of handlebars
 app.set('view engine', '.hbs'); // Use handlebars engine for *.hbs files.
+app.set('views', './views');
 
 // #################### ROUTE HANDLERS #######################
 
@@ -218,7 +234,7 @@ app.post('/flower_edit', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        console.log(`Redirect Data: ${JSON.stringify(data)}`)
+        console.log(`Flower Redirect Data: ${JSON.stringify(data)}`)
         // if (typeof data !== 'string') { data. = }
 
         // Create and execute queries
@@ -227,7 +243,15 @@ app.post('/flower_edit', async function (req, res) {
         // console.log(`Color: ${JSON.stringify(color)}`);
 
         // Redirect the user to the update page
-        res.render('flowers_edit', {data: data, colors: colors_fields});
+        res.render('flowers_edit', {data: data, colors: colors_fields,
+            helpers: {
+                shouldBeSelected(stringa, stringb){
+                    if (stringa === stringb) {
+                        {{'selected'}};
+                    }
+                }
+            }
+        });
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
@@ -385,7 +409,15 @@ app.post('/bouquet_edit', async function (req, res) {
         const [recipients_fields] = await db.query(recipient_query);
 
         // Redirect the user to the update page
-        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields});
+        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields,
+            helpers: {
+                shouldBeSelected: function (stringa, stringb) {
+                    if (stringa === stringb) {
+                        return 'selected';
+                    }
+                }
+            }
+        });
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser

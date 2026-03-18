@@ -37,7 +37,11 @@
             <td><select name='update_maker_id' id='update_maker_id'>
                 <option value='NULL' disabled selected>Select a Maker</option>
                 {{#each makers}}
-                    <option value='{{this.MAKER_ID}}' required>{{this.MAKER_ID}}-{{this.NAME}}</option>
+                    <option value='{{this.MAKER_ID}}'
+                        {{#if (shouldBeSelected this.NAME data.update_maker_id)}}
+                            selected
+                        {{/if}}
+                    required>{{this.MAKER_ID}}-{{this.NAME}}</option>
                 {{/each}}
             </select>
                 <br/></td>
@@ -48,8 +52,10 @@
                 <option value='NULL' disabled selected>Select a Recipient</option>
                 {{#each recipients}}
                     <option value='{{this.RECIPIENT_ID}}'
-
-                            required>{{this.RECIPIENT_ID}}-{{this.NAME}}</option>
+                        {{#if (shouldBeSelected this.NAME data.update_recipient_id)}}
+                            selected
+                        {{/if}}
+                    required>{{this.RECIPIENT_ID}}-{{this.NAME}}</option>
                 {{/each}}
             </select>
             </td>
