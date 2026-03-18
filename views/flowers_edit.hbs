@@ -25,7 +25,7 @@
                     <option value='NULL' disabled>Select Color</option>
                     {{#each colors}}
                         <option value='{{this.COLOR_ID}}'
-                            {{#if (shouldBeSelected this.COLOR data.update_flower_color)}}
+                            {{#if (shouldBeSelected this.COLOR)}}
                                 selected
                             {{/if}}
                         required>{{this.COLOR_ID}}: {{this.COLOR}}</option>

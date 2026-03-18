@@ -63,10 +63,10 @@
             <td>Add New</td>
             <td><input type='text' name='create_flower_name' id='create_flower_name' required/></td>
             <td><input type='text' name='create_flower_meaning' id='create_flower_meaning' required/></td>
-            <td><select name='create_color_id' id='create_color_id'>
+            <td><select name='create_color_id' id='create_color_id' required>
                 <option value='NULL' disabled selected>Select a Color</option>
                 {{#each color}}
-                    <option value='{{this.COLOR_ID}}' required>{{this.COLOR}}</option>
+                    <option value='{{this.COLOR_ID}}'>{{this.COLOR}}</option>
                 {{/each}}
             </select></td>
             <td colspan="2"><input type='submit'/></td>

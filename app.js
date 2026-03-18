@@ -244,10 +244,12 @@ app.post('/flower_edit', async function (req, res) {
 
         // Redirect the user to the update page
         res.render('flowers_edit', {data: data, colors: colors_fields,
+            // Citation - code to populate selected field adapted from source url:
+            // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
-                shouldBeSelected(stringa, stringb){
-                    if (stringa === stringb) {
-                        {{'selected'}};
+                shouldBeSelected: function (stringa) {
+                    if (stringa.valueOf().trim().toLowerCase() === data.update_flower_color.valueOf().trim().toLowerCase()) {
+                        return 'selected';
                     }
                 }
             }
@@ -330,49 +332,16 @@ app.post('/bouquets/create',
                 data.create_recipient_id,
             ]);
 
-            let b_id_created = db_results.created_id;
-            let flowers = data.create_bouquet_flowers;
-            // console.log(JSON.stringify(flowers));
 
-            // console.log("Created: " + JSON.stringify(db_results.created_id));
 
-            // const flower_query = 'CALL sp_add_ftob(?, ?);';
-
-            //Add selected flowers to bouquet
-            //This should be safe because await, but this can't be a good idea
-            //It's not a good idea, change this to use Promise.all
-            // Refs for citation:
-            // https://stackoverflow.com/questions/54153347/how-does-array-foreach-handle-async-functions
-            // https://stackoverflow.com/questions/43057807/using-promise-all-on-the-entries-of-a-map
-
-            // TODO Optimize this by adding WHILE loop to SP
-            // https://www.geeksforgeeks.org/sql/mysql-while-loop/
-            // https://dev.mysql.com/doc/refman/8.4/en/json-attribute-functions.html
-            if (typeof flowers !== 'undefined' && flowers.length > 0) {
-                //     // flowers.forEach(async (flower, b_id_created) => {
-                //         console.log("Flower: " + flowers[0] + ", Bouquet: " + b_id_created);
-                //
-                //         await db.query(flower_query, [
-                //             flowers[0],
-                //             db_results.created_id
-                //         ]);
-                //
-                //     console.log("Flower: " + flowers[1] + ", Bouquet: " + b_id_created);
-                //     await db.query(flower_query, [
-                //         flowers[1],
-                //         db_results.created_id
-                //     ]);
-                //     // });
-                // }
-
-                for (const flower of flowers) {
-                    const flower_query = `CALL sp_add_ftob(?, ?);`;
-                    await db.query(flower_query, [
-                        flower,
-                        b_id_created
-                    ]);
-                }
-            }
+            //     // for (const flower of flowers) {
+            //     //     const flower_query = `CALL sp_add_ftob(?, ?);`;
+            //     //     await db.query(flower_query, [
+            //     //         flower,
+            //     //         b_id_created
+            //     //     ]);
+            //     // }
+            // }
 
             // console.log("Added flowers");
             // Redirect the user to the updated webpage
@@ -391,7 +360,7 @@ app.post('/bouquet_edit', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        console.log(`Redirect Data: ${JSON.stringify(data)}`)
+        console.log(`Bouquet Redirect Data: ${JSON.stringify(data)}`)
         // if (typeof data !== 'string') { data. = }
 
         const bouquets_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
@@ -410,9 +379,16 @@ app.post('/bouquet_edit', async function (req, res) {
 
         // Redirect the user to the update page
         res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields,
+            // Citation - code to populate selected field adapted from source url:
+            // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
-                shouldBeSelected: function (stringa, stringb) {
-                    if (stringa === stringb) {
+                shouldBeSelectedMaker: function (stringa) {
+                    if (typeof data.update_maker_id !== 'undefined' && data.update_maker_id.valueOf().trim().toLowerCase() === stringa.valueOf().trim().toLowerCase()) {
+                        return 'selected';
+                    }
+                },
+                shouldBeSelectedRecipient: function (stringa) {
+                    if (typeof data.update_recipient_id !== 'undefined' && data.update_recipient_id === stringa) {
                         return 'selected';
                     }
                 }
@@ -432,16 +408,44 @@ app.post('/bouquets/update', async function (req, res) {
     try {
         //Process data (access and sanitize)
         const data = req.body;
-        console.log(`Redirected Data: ${JSON.stringify(data)}`)
+        console.log(`Bouquet Redirected Data: ${JSON.stringify(data)}`)
 
+        let flowers = data.update_bouquet_flowers;
+        let bouquet_id = data.update_select_bouquet_id;
+
+        //Update bouquet itself
         const update_query = 'CALL sp_update_bouquet(?, ?, ?, ?, ?);';
         await db.query(update_query, [
-            data.update_select_bouquet_id,
+            bouquet_id,
             data.update_bouquet_name,
             data.update_bouquet_description,
             data.update_maker_id,
             data.update_recipient_id,
         ]);
+
+        //Add selected flowers to bouquet
+        //This should be safe because await, but this can't be a good idea
+        //Try changing this to use Promise.all
+        // Refs for citation:
+        // https://stackoverflow.com/questions/54153347/how-does-array-foreach-handle-async-functions
+        // https://stackoverflow.com/questions/43057807/using-promise-all-on-the-entries-of-a-map
+
+        // TODO Optimize this by adding WHILE loop to SP
+        // https://www.geeksforgeeks.org/sql/mysql-while-loop/
+        // https://dev.mysql.com/doc/refman/8.4/en/json-attribute-functions.html
+
+        //Add/edit flowers
+        console.log(`Flowers: ${JSON.stringify(flowers)}`);
+        const flower_query = 'CALL sp_add_ftob(?, ?);';
+
+        if (typeof flowers !== 'undefined' && flowers.length > 0) {
+            flowers.forEach(async (flower) => {
+                // for (const flower of flowers) {
+                // async (flower, bouquet_id) => {
+                console.log("Flower: " + flower + ", Bouquet: " + bouquet_id);
+                await db.query(flower_query, [flower, bouquet_id]);
+            })
+        };
 
         // Redirect the user to the updated webpage data
         res.redirect('/bouquets');
