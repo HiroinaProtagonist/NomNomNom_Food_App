@@ -391,13 +391,23 @@ app.post('/bouquet_edit', async function (req, res) {
         const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
         const [recipients_fields] = await db.query(recipient_query);
 
+        const bouquet_flowers_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
+        const [bouquets_flowers_fields] = await db.query(bouquet_flowers_query);
+
+        // bouquets_flowers_fields.forEach(y => console.log(`Y1: ${JSON.stringify(y)}`));
+        // console.log(`Bouquet_Flowers: ${JSON.stringify(bouquets_flowers_fields)}`);
+        
+        const filtered_bouquet_flowers = bouquets_flowers_fields
+            .filter(y => y.BOUQUET_ID.toString().valueOf().trim().toLowerCase() === data.update_bouquet_id.toString().valueOf().trim().toLowerCase())
+            .map(y => y.FLOWER_ID);
+        console.log(`Filtered Bouquet_Flowers: ${JSON.stringify(filtered_bouquet_flowers)}`);
+        
         //currently getting flowers
         // instead get m:m table from db to get which flowers are in bouquets, filter by bouquet_id
         // helper can select those flowers in the multi-select
-
-
+        
         // Redirect the user to the update page
-        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields, colors: colors_fields,
+        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields, colors: colors_fields, bouquet_flowers: bouquets_flowers_fields,
             // Citation - code to populate selected field adapted from source url:
             // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
@@ -413,8 +423,8 @@ app.post('/bouquet_edit', async function (req, res) {
                 },
                 shouldBeSelectedFlower: function (stringa) {
                     //if stringa is in flowers, the array of flowers in this bouquet, return selected
-                    if (typeof flowers !== 'undefined' && flowers.length > 0) {
-                        if (flowers.includes(stringa)) {
+                    if (typeof filtered_bouquet_flowers !== 'undefined' && filtered_bouquet_flowers.length > 0) {
+                        if (filtered_bouquet_flowers.includes(stringa)) {
                             return 'selected';
                         }
                     }
