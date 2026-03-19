@@ -56,7 +56,7 @@
         </tr>
     {{/each}}
 
-    <tr ><td colspan='7'>&nbsp;</td></tr>
+    <tr ><td colspan='6'>&nbsp;</td></tr>
 
     <form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
         <tr>
@@ -69,7 +69,7 @@
                     <option value='{{this.COLOR_ID}}'>{{this.COLOR}}</option>
                 {{/each}}
             </select></td>
-            <td colspan="2"><input type='submit'/></td>
+            <td colspan="2"><input type='submit' value="Add New Flower"/></td>
         </tr>
     </form>
     </tbody>

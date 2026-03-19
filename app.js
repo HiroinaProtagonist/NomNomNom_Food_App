@@ -367,18 +367,37 @@ app.post('/bouquet_edit', async function (req, res) {
         const [bouquets_fields] = await db.query(bouquets_query);
         // console.log(JSON.stringify(bouquet));
 
+        const color_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
+        const [colors_fields] = await db.query(color_query);
+
         const maker_query = fs.readFileSync(path.join(__dirname, 'queries', 'makers.sql'), 'utf8');
         const [makers_fields] = await db.query(maker_query);
 
         const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
         const [flowers_fields] = await db.query(flower_query);
-        // console.log(`Color: ${JSON.stringify(color)}`);
+        console.log(`Flowers: ${JSON.stringify(flowers_fields)}`);
+
+        // const bouquet_flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
+        // const [flowers_fields] = await db.query(flower_query);
+
+        console.log(`Bouquet id: ${data.update_bouquet_id}`);
+        console.log(`Flower Id - 0: ${flowers_fields[0].FLOWER_ID}`)
+        console.log(flowers_fields[0].FLOWER_ID === data.update_bouquet_id)
+        // flowers_fields.forEach(y => console.log(y));
+
+        const flowers = flowers_fields.filter(y => y.FLOWER_ID === data.update_bouquet_id);
+        console.log(`Filtered Flowers: ${JSON.stringify(flowers)}`);
 
         const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
         const [recipients_fields] = await db.query(recipient_query);
 
+        //currently getting flowers
+        // instead get m:m table from db to get which flowers are in bouquets, filter by bouquet_id
+        // helper can select those flowers in the multi-select
+
+
         // Redirect the user to the update page
-        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields,
+        res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields, colors: colors_fields,
             // Citation - code to populate selected field adapted from source url:
             // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
@@ -391,9 +410,17 @@ app.post('/bouquet_edit', async function (req, res) {
                     if (typeof data.update_recipient_id !== 'undefined' && data.update_recipient_id === stringa) {
                         return 'selected';
                     }
+                },
+                shouldBeSelectedFlower: function (stringa) {
+                    //if stringa is in flowers, the array of flowers in this bouquet, return selected
+                    if (typeof flowers !== 'undefined' && flowers.length > 0) {
+                        if (flowers.includes(stringa)) {
+                            return 'selected';
+                        }
+                    }
+                    ;
                 }
-            }
-        });
+            }});
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
