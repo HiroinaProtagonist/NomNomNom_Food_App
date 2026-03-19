@@ -475,13 +475,15 @@ app.post('/bouquets/update', async function (req, res) {
         console.log(`Flowers: ${JSON.stringify(flowers)}`);
         const flower_query = 'CALL sp_add_ftob(?, ?);';
 
-        if (typeof flowers !== 'undefined' && flowers.length > 0) {
+        if (typeof flowers !== 'undefined' && flowers.length > 1) {
             flowers.forEach(async (flower) => {
                 // for (const flower of flowers) {
                 // async (flower, bouquet_id) => {
                 console.log("Flower: " + flower + ", Bouquet: " + bouquet_id);
                 await db.query(flower_query, [flower, bouquet_id]);
             })
+        } else if(typeof flowers !== 'undefined' && flowers.length > 0) {
+            await db.query(flower_query, [flowers, bouquet_id]);
         };
 
         // Redirect the user to the updated webpage data

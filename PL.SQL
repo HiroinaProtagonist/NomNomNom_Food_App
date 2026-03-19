@@ -150,7 +150,7 @@ CREATE PROCEDURE sp_add_ftob(
     IN in_flower_id INT,
     IN in_bouquet_id INT)
 BEGIN
-    INSERT INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
+    INSERT IGNORE INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
     VALUES (in_flower_id, in_bouquet_id );
 END //
 DELIMITER ;
