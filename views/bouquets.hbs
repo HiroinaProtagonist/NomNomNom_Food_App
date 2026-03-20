@@ -20,6 +20,30 @@
     </thead>
 
     <tbody>
+
+    {{! ADD BOUQUET form }}
+    <form class='cuForm' id='create_flower_form' METHOD='POST' action='/bouquets/create'>
+        <tr>
+            <td>Add New</td>
+            <td><input type='text' name='bouquet_name' id='bouquet_name' required/></td>
+            <td><input type='text' name='bouquet_description' id='bouquet_description'/></td>
+            <td><select name='maker_id' id='maker_id' required>
+                <option value='NULL' disabled selected>Select a Maker</option>
+                {{#each makers}}
+                    <option value='{{this.MAKER_ID}}' required>{{this.MAKER_ID}}-{{this.NAME}}</option>
+                {{/each}}
+            </select></td>
+            <td><select name='recipient_id' id='recipient_id'>
+                <option value='NULL' disabled selected>Select a Recipient</option>
+                {{#each recipients}}
+                    <option value='{{this.RECIPIENT_ID}}' required>{{this.RECIPIENT_ID}}-{{this.NAME}}</option>
+                {{/each}}
+            </select>
+            </td>
+            <td colspan="2"><input type='submit' value="Add New Bouquet"/></td>
+        </tr>
+    </form>
+
     {{! Fields }}
     {{#each bouquets}}
         <tr>
@@ -31,11 +55,11 @@
 
             {{! UPDATE form }}
             <form id='update_bouquet_form' METHOD='POST' action='/bouquet_edit'>
-                <input type='hidden' name='update_bouquet_id' value='{{this.NUMBER}}'/>
-                <input type='hidden' name='update_bouquet_name' value='{{this.BOUQUET}}' />
-                <input type='hidden' name='update_bouquet_description' value='{{this.DESCRIPTION}}' />
-                <input type='hidden' name='update_maker_id' value='{{this.MAKER}}' />
-                <input type='hidden' name='update_recipient_id' value='{{this.RECIPIENT}}' />
+                <input type='hidden' name='bouquet_id' value='{{this.NUMBER}}'/>
+                <input type='hidden' name='bouquet_name' value='{{this.BOUQUET}}' />
+                <input type='hidden' name='bouquet_description' value='{{this.DESCRIPTION}}' />
+                <input type='hidden' name='maker_id' value='{{this.MAKER}}' />
+                <input type='hidden' name='recipient_id' value='{{this.RECIPIENT}}' />
                 <td>
                     <button type='submit'>
                         Edit
@@ -45,8 +69,8 @@
 
             {{! DELETE form }}
             <form id='delete_bouquet_form' METHOD='POST' action='/bouquets/delete'>
-                <input type='hidden' name='delete_bouquet_id' value='{{this.NUMBER}}'/>
-                <input type='hidden' name='delete_bouquet_name' value='{{this.BOUQUET}}'/>
+                <input type='hidden' name='bouquet_id' value='{{this.NUMBER}}'/>
+                <input type='hidden' name='bouquet_name' value='{{this.BOUQUET}}'/>
                 <td>
                     <button type='submit'>
                         Delete
@@ -55,31 +79,6 @@
             </form>
         </tr>
     {{/each}}
-
-    <tr><td colspan='7'>&nbsp;</td></tr>
-
-    <form class='cuForm' id='create_flower_form' METHOD='POST' action='/bouquets/create'>
-        <tr>
-            <td>Add New</td>
-            <td><input type='text' name='create_bouquet_name' id='create_bouquet_name' required/></td>
-            <td><input type='text' name='create_bouquet_description' id='create_bouquet_description' required/></td>
-            <td><select name='create_maker_id' id='create_maker_id' required>
-                <option value='NULL' disabled selected>Select a Maker</option>
-                {{#each makers}}
-                    <option value='{{this.MAKER_ID}}' required>{{this.MAKER_ID}}-{{this.NAME}}</option>
-                {{/each}}
-            </select></td>
-            <td><select name='create_recipient_id' id='create_recipient_id'>
-                <option value='NULL' disabled selected>Select a Recipient</option>
-                {{#each recipients}}
-                    <option value='{{this.RECIPIENT_ID}}' required>{{this.RECIPIENT_ID}}-{{this.NAME}}</option>
-                {{/each}}
-            </select>
-            </td>
-            <td colspan="2"><input type='submit' value="Add New Bouquet"/></td>
-        </tr>
-    </form>
-
     </tbody>
 </table>
 </br>

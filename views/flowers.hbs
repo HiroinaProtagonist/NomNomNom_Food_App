@@ -22,6 +22,23 @@
     </thead>
 
     <tbody>
+
+    {{! ADD FLOWER form }}
+    <form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
+        <tr>
+            <td>Add New</td>
+            <td><input type='text' name='create_flower_name' id='create_flower_name' required/></td>
+            <td><input type='text' name='create_flower_meaning' id='create_flower_meaning' required/></td>
+            <td><select name='create_color_id' id='create_color_id' required>
+                <option value='NULL' disabled selected>Select a Color</option>
+                {{#each color}}
+                    <option value='{{this.COLOR_ID}}'>{{this.COLOR}}</option>
+                {{/each}}
+            </select></td>
+            <td colspan="2"><input type='submit' value="Add New Flower"/></td>
+        </tr>
+    </form>
+
     {{! FIELDS }}
     {{#each flower}}
         <tr>
@@ -55,22 +72,5 @@
             </form>
         </tr>
     {{/each}}
-
-    <tr ><td colspan='6'>&nbsp;</td></tr>
-
-    <form class='cuForm' id='create_flower_form' METHOD='POST' action='/flowers/create'>
-        <tr>
-            <td>Add New</td>
-            <td><input type='text' name='create_flower_name' id='create_flower_name' required/></td>
-            <td><input type='text' name='create_flower_meaning' id='create_flower_meaning' required/></td>
-            <td><select name='create_color_id' id='create_color_id' required>
-                <option value='NULL' disabled selected>Select a Color</option>
-                {{#each color}}
-                    <option value='{{this.COLOR_ID}}'>{{this.COLOR}}</option>
-                {{/each}}
-            </select></td>
-            <td colspan="2"><input type='submit' value="Add New Flower"/></td>
-        </tr>
-    </form>
     </tbody>
 </table>

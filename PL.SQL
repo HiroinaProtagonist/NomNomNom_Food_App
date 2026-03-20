@@ -150,6 +150,9 @@ CREATE PROCEDURE sp_add_ftob(
     IN in_flower_id INT,
     IN in_bouquet_id INT)
 BEGIN
+-- The following code references the following
+-- Source URL:
+-- https://www.scaler.com/topics/mysql-insert-if-not-exists/
     INSERT IGNORE INTO FLOWERS_BOUQUETS (FLOWER_ID, BOUQUET_ID)
     VALUES (in_flower_id, in_bouquet_id );
 END //
@@ -202,4 +205,38 @@ BEGIN
     COMMIT;
     SELECT 'Bouquet successfully deleted' AS Result;
 END //
+DELIMITER ;
+
+-- To delete given flower from the FLOWERS_BOUQUETS table for given bouquet
+DROP PROCEDURE IF EXISTS sp_delete_bouquet_flower;
+DELIMITER //
+CREATE PROCEDURE sp_delete_bouquet_flower(
+    IN in_flower_id INT,
+    IN in_bouquet_id INT)
+    BEGIN
+        DECLARE error_message VARCHAR(255);
+        DECLARE EXIT HANDLER FOR SQLEXCEPTION
+        BEGIN
+            -- Rollback if failure in any statement and show failure message
+            ROLLBACK;
+            SELECT 'Error. Rollback triggered.' AS Result;
+        END;
+
+        -- Initiate transaction
+        START TRANSACTION;
+            DELETE FROM FLOWERS_BOUQUETS WHERE BOUQUET_ID = in_bouquet_id AND FLOWER_ID = in_flower_id;
+
+            -- ROW_COUNT() returns the number of rows affected by the preceding statement.
+            IF ROW_COUNT() = 0 THEN
+                set error_message = CONCAT('No matching record found for bouquet: ',
+                in_bouquet_id, ' and flower: ', in_flower_id);
+
+                -- Trigger custom error, invoke EXIT HANDLER
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
+            END IF;
+
+        -- Commit transaction and show success message
+        COMMIT;
+        SELECT 'Flower successfully deleted from bouquet' AS Result;
+    END //
 DELIMITER ;

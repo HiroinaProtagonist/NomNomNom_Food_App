@@ -4,26 +4,28 @@
 <!--Changes made beyond the starter code are our own without reference to AI-->
 
 <h1>Edit a Bouquet</h1>
-    <table id="update_bouquet_form_table">
+<table>
+    <thead>
+    <tr>
+        <th><label for='bouquet_name'>Name </label></th>
+        <th><label for='bouquet_description'>Description </label></th>
+        <th><label for='maker_id'>Maker </label></th>
+        <th><label for='recipient_id'>Recipient </label></th>
+        <form class='cuForm' id='bouquet_return_form' METHOD='GET' action='/bouquets'>
+            <th><input type='submit' value='Return to Bouquets'/></th>
+        </form>
+    </tr>
+    </thead>
+    <tbody>
+    <form class='cuForm' id='update_bouquet_form' METHOD='POST' action='/bouquets/update'>
         <tr>
-            <td><label for='update_bouquet_name'>Name </label></td>
-            <td><label for='update_bouquet_description'>Description </label></td>
-            <td><label for='update_maker_id'>Maker </label></td>
-            <td><label for='update_recipient_id'>Recipient </label></td>
-            <form class='cuForm' id='bouquet_return_form' METHOD='GET' action='/bouquets'>
-                <td><input type='submit' value='Return to Bouquets'/></td>
-            </form>
-        </tr>
+            <td><input type='text' name='bouquet_name'
+                       id='bouquet_name' value='{{data.bouquet_name}}' required/><br/></td>
 
-        <form class='cuForm' id='update_bouquet_form' METHOD='POST' action='/bouquets/update'>
-        <tr>
-            <td><input type='text' name='update_bouquet_name'
-                       id='update_bouquet_name' value='{{data.update_bouquet_name}}' required/><br/></td>
+            <td><input type='text' name='bouquet_description'
+                       id='bouquet_description' value='{{data.bouquet_description}}' required/><br/></td>
 
-            <td><input type='text' name='update_bouquet_description'
-                       id='update_bouquet_description' value='{{data.update_bouquet_description}}' required/><br/></td>
-
-            <td><select name='update_maker_id' id='update_maker_id'>
+            <td><select name='maker_id' id='maker_id'>
                 <option value='NULL' disabled selected>Select a Maker</option>
                 {{#each makers}}
                     <option value='{{this.MAKER_ID}}'
@@ -34,8 +36,9 @@
                 {{/each}}
             </select></td>
 
-            <td><select name='update_recipient_id' id='update_recipient_id'>
+            <td><select name='recipient_id' id='recipient_id'>
                 <option value='NULL' disabled selected>Select a Recipient</option>
+                <option value='NULL' }}></option>
                 {{#each recipients}}
                     <option value='{{this.RECIPIENT_ID}}'
                         {{#if (shouldBeSelectedRecipient this.NAME)}}
@@ -45,33 +48,77 @@
                 {{/each}}
             </select></td>
             <td>
-<!--                <input type='submit' value='Update Bouquet'/>-->
+                <input type='submit' value='Update Bouquet'/>
             </td>
         </tr>
-            <input type='hidden' name='update_select_bouquet_id' value='{{data.update_bouquet_id}}'/>
-<!--        </form>-->
+        <input type='hidden' name='bouquet_id' value='{{data.bouquet_id}}'/>
+    </form>
 
-        <tr><td colspan="5">&nbsp;</td></tr>
-<!--        <form class='cuForm' id='create_flower_form' METHOD='POST' action='/bouquet/flower/create'>-->
-            <tr><td><label for='update_bouquet_flowers'>Flowers: </label></td>
-                <td colspan="4"></td>
-            </tr>
-            <tr>
-                <td><select name='update_bouquet_flowers' id='update_bouquet_flowers' required multiple>
-                    <option value='NULL' disabled selected>Select Flowers</option>
+    <form class='cuForm' id='add_bouquet_flower_form' METHOD='POST' action='/bouquet_flower_add'>
+        <tr>
+            <td colspan="5">&nbsp;</td>
+        </tr>
+        {{! ADD FLOWER Form }}
+        <tr>
+            <input type='hidden' name='bouquet_id' value='{{data.bouquet_id}}'/>
+            <input type='hidden' name='bouquet_name' value='{{data.bouquet_name}}'/>
+            <input type='hidden' name='bouquet_description' value='{{data.bouquet_description}}'/>
+            <input type='hidden' name='maker_id' value='{{data.maker_id}}'/>
+            <input type='hidden' name='recipient_id' value='{{data.recipient_id}}'/>
+            <td><label for='add_bouquet_flower_id'><b>Manage {{data.bouquet_name}}'s Flowers: </b></label></td>
+
+            {{! Possible to do multiple, but not aesthetic }}
+            <td colspan="3">
+                <select name='add_bouquet_flower_id' id='add_bouquet_flower_id'>
+                    <option value='NULL' disabled selected>Add Flower to Bouquet</option>
                     {{#each flowers}}
-                        <option value='{{this.FLOWER_ID}}'
-                            {{#if (shouldBeSelectedFlower this.FLOWER_ID)}}
-                                selected
-                            {{/if}}
-                        >{{this.FLOWER_ID}}: {{this.COLOR}} {{this.NAME}}</option>
+                        <option value='{{this.FLOWER_ID}}'>
+                            {{this.FLOWER_ID}}: {{this.COLOR}} {{this.NAME}}, {{this.MEANING}}
+                        </option>
                     {{/each}}
-                </select></td>
-                <td colspan="4"></td>
-            <tr><td colspan="4">&nbsp;</td><td><input type='submit' value='Update Bouquet'/></td></tr>
+                </select>
+            </td>
+            <td>
+                <input type='submit' value="Add Flower to Bouquet"/>
+            </td>
+        </tr>
+        {{#if (headerNeeded fbflowers)}}
+            <tr>
+                <td>Flower</td><td colspan="2">Meaning</td><td>&nbsp;</td><td>&nbsp;</td>
             </tr>
-        </form>
-    </table>
+        {{/if}}
+    </form>
 
 
 
+
+
+    {{#each fbflowers}}
+        <tr>
+            {{! Redirects to edit flower with data }}
+            <form class='cuForm' id='update_bouquet_flower_form' METHOD='POST' action='/flower_edit'>
+                <input type='hidden' name='update_flower_id' value='{{this.FLOWER_ID}}'/>
+                <input type='hidden' name='update_flower_name' value='{{this.NAME}}'/>
+                <input type='hidden' name='update_flower_meaning' value='{{this.MEANING}}'/>
+                <input type='hidden' name='update_flower_color' value='{{this.COLOR}}'/>
+                <td>{{this.FLOWER_ID}}: {{this.COLOR}} {{this.NAME}}</td>
+                <td colspan="2">{{this.MEANING}}</td>
+                <td><input type='submit' value='Edit Flower'/></td>
+            </form>
+
+            {{! DELETE form }}
+            <form class='cuForm' id='delete_bouquet_flower_form' METHOD='POST' action='/bouquet_flower_delete'>
+                <!-- Variable access outside parent scope referenced from -->
+                <!-- source url: https://stackoverflow.com/a/13645315/11312977 -->
+                <input type='hidden' name='bouquet_id' value='{{../data.bouquet_id}}'/>
+                <input type='hidden' name='flower_id' value='{{this.FLOWER_ID}}'/>
+                <input type='hidden' name='bouquet_name' value='{{../data.bouquet_name}}'/>
+                <input type='hidden' name='bouquet_description' value='{{../data.bouquet_description}}'/>
+                <input type='hidden' name='maker_id' value='{{../data.maker_id}}'/>
+                <input type='hidden' name='recipient_id' value='{{../data.recipient_id}}'/>
+                <td><input type='submit' value='Remove from Bouquet'/></td>
+            </form>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
