@@ -386,8 +386,6 @@ app.post('/bouquet_edit', async function (req, res) {
         } else if (filtered_bouquet_flowers.length > 0) {
             filtered_bouquet_flowers_ids = filtered_bouquet_flowers.FLOWER_ID;
         }
-
-        // console.log(`Filtered Bouquet_Flower Ids: ${JSON.stringify(filtered_bouquet_flowers_ids)}`);
         
         // Redirect the user to the update page
         console.log(`Data-edit: ${JSON.stringify(data)}`);
@@ -500,7 +498,6 @@ app.post('/bouquet_flower_add', async function (req, res) {
         // Populate re-rendered edit page
         const bouquets_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
         const [bouquets_fields] = await db.query(bouquets_query);
-        // console.log(JSON.stringify(bouquet));
 
         const color_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
         const [colors_fields] = await db.query(color_query);
@@ -510,18 +507,8 @@ app.post('/bouquet_flower_add', async function (req, res) {
 
         const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
         const [flowers_fields] = await db.query(flower_query);
-        // console.log(`Flowers: ${JSON.stringify(flowers_fields)}`);
 
-        // const bouquet_flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
-        // const [flowers_fields] = await db.query(flower_query);
-
-        // console.log(`Bouquet id: ${data.update_bouquet_id}`);
-        // console.log(`Flower Id - 0: ${flowers_fields[0].FLOWER_ID}`)
-        // console.log(flowers_fields[0].FLOWER_ID === data.update_bouquet_id)
-        // flowers_fields.forEach(y => console.log(y));
-
-        const flowers = flowers_fields.filter(y => y.FLOWER_ID === data.update_bouquet_id);
-        // console.log(`Filtered Flowers: ${JSON.stringify(flowers)}`);
+        const flowers = flowers_fields.filter(y => y.FLOWER_ID === data.bouquet_id);
 
         const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
         const [recipients_fields] = await db.query(recipient_query);
@@ -529,14 +516,10 @@ app.post('/bouquet_flower_add', async function (req, res) {
         const bouquet_flowers_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
         const [bouquets_flowers_fields] = await db.query(bouquet_flowers_query);
 
-        // bouquets_flowers_fields.forEach(y => console.log(`Y1: ${JSON.stringify(y)}`));
-        // console.log(`Bouquet_Flowers: ${JSON.stringify(bouquets_flowers_fields)}`);
-
         const filtered_bouquet_flowers = bouquets_flowers_fields
             .filter(y => y.BOUQUET_ID !== null && typeof y.BOUQUET_ID !== 'undefined')
             .filter(y => y.BOUQUET_ID.toString().valueOf().trim().toLowerCase()
                 === data.bouquet_id.toString().valueOf().trim().toLowerCase());
-        // .map(y => y.FLOWER_ID);
         console.log(`Filtered Bouquet_Flowers: ${JSON.stringify(filtered_bouquet_flowers)}`);
 
         let filtered_bouquet_flowers_ids = null;
@@ -546,20 +529,18 @@ app.post('/bouquet_flower_add', async function (req, res) {
             filtered_bouquet_flowers_ids = filtered_bouquet_flowers.FLOWER_ID;
         }
 
-        // console.log(`Filtered Bouquet_Flower Ids: ${JSON.stringify(filtered_bouquet_flowers_ids)}`);
-
         // Redirect the user to the update page
         res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields, colors: colors_fields, fbflowers: filtered_bouquet_flowers,
             // Citation - code to populate selected field adapted from source url:
             // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
                 shouldBeSelectedMaker: function (stringa) {
-                    if (typeof data.update_maker_id !== 'undefined' && data.update_maker_id.valueOf().trim().toLowerCase() === stringa.valueOf().trim().toLowerCase()) {
+                    if (typeof data.maker_id !== 'undefined' && data.maker_id.valueOf().trim().toLowerCase() === stringa.valueOf().trim().toLowerCase()) {
                         return 'selected';
                     }
                 },
                 shouldBeSelectedRecipient: function (stringa) {
-                    if (typeof data.update_recipient_id !== 'undefined' && data.update_recipient_id === stringa) {
+                    if (typeof data.recipient_id !== 'undefined' && data.recipient_id === stringa) {
                         return 'selected';
                     }
                 },
@@ -599,7 +580,6 @@ app.post('/bouquet_flower_delete', async function (req, res) {
         // Populate re-rendered edit page
         const bouquets_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_bouquets.sql'), 'utf8');
         const [bouquets_fields] = await db.query(bouquets_query);
-        // console.log(JSON.stringify(bouquet));
 
         const color_query = fs.readFileSync(path.join(__dirname, 'queries', 'colors.sql'), 'utf8');
         const [colors_fields] = await db.query(color_query);
@@ -609,18 +589,8 @@ app.post('/bouquet_flower_delete', async function (req, res) {
 
         const flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'flowers.sql'), 'utf8');
         const [flowers_fields] = await db.query(flower_query);
-        // console.log(`Flowers: ${JSON.stringify(flowers_fields)}`);
 
-        // const bouquet_flower_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
-        // const [flowers_fields] = await db.query(flower_query);
-
-        // console.log(`Bouquet id: ${data.update_bouquet_id}`);
-        // console.log(`Flower Id - 0: ${flowers_fields[0].FLOWER_ID}`)
-        // console.log(flowers_fields[0].FLOWER_ID === data.update_bouquet_id)
-        // flowers_fields.forEach(y => console.log(y));
-
-        const flowers = flowers_fields.filter(y => y.FLOWER_ID === data.update_bouquet_id);
-        // console.log(`Filtered Flowers: ${JSON.stringify(flowers)}`);
+        const flowers = flowers_fields.filter(y => y.FLOWER_ID === data.bouquet_id);
 
         const recipient_query = fs.readFileSync(path.join(__dirname, 'queries', 'recipients.sql'), 'utf8');
         const [recipients_fields] = await db.query(recipient_query);
@@ -628,15 +598,10 @@ app.post('/bouquet_flower_delete', async function (req, res) {
         const bouquet_flowers_query = fs.readFileSync(path.join(__dirname, 'queries', 'bouquets_flowers.sql'), 'utf8');
         const [bouquets_flowers_fields] = await db.query(bouquet_flowers_query);
 
-        // bouquets_flowers_fields.forEach(y => console.log(`Y1: ${JSON.stringify(y)}`));
-        // console.log(`Bouquet_Flowers: ${JSON.stringify(bouquets_flowers_fields)}`);
-
         const filtered_bouquet_flowers = bouquets_flowers_fields
             .filter(y => y.BOUQUET_ID !== null && typeof y.BOUQUET_ID !== 'undefined')
             .filter(y => y.BOUQUET_ID.toString().valueOf().trim().toLowerCase()
                 === data.bouquet_id.toString().valueOf().trim().toLowerCase());
-        // .map(y => y.FLOWER_ID);
-        // console.log(`Filtered Bouquet_Flowers: ${JSON.stringify(filtered_bouquet_flowers)}`);
 
         let filtered_bouquet_flowers_ids = null;
         if (filtered_bouquet_flowers.length > 1) {
@@ -645,8 +610,6 @@ app.post('/bouquet_flower_delete', async function (req, res) {
             filtered_bouquet_flowers_ids = filtered_bouquet_flowers.FLOWER_ID;
         }
 
-        // console.log(`Filtered Bouquet_Flower Ids: ${JSON.stringify(filtered_bouquet_flowers_ids)}`);
-
         // Redirect the user to the update page
         console.log(`Data-del: ${JSON.stringify(data)}`);
         res.render('bouquets_edit', {data: data, makers: makers_fields, recipients: recipients_fields, flowers: flowers_fields, colors: colors_fields, fbflowers: filtered_bouquet_flowers,
@@ -654,12 +617,12 @@ app.post('/bouquet_flower_delete', async function (req, res) {
             // Source url: https://www.npmjs.com/package/express-handlebars
             helpers: {
                 shouldBeSelectedMaker: function (stringa) {
-                    if (typeof data.update_maker_id !== 'undefined' && data.update_maker_id.valueOf().trim().toLowerCase() === stringa.valueOf().trim().toLowerCase()) {
+                    if (typeof data.maker_id !== 'undefined' && data.maker_id.valueOf().trim().toLowerCase() === stringa.valueOf().trim().toLowerCase()) {
                         return 'selected';
                     }
                 },
                 shouldBeSelectedRecipient: function (stringa) {
-                    if (typeof data.update_recipient_id !== 'undefined' && data.update_recipient_id === stringa) {
+                    if (typeof data.recipient_id !== 'undefined' && data.recipient_id === stringa) {
                         return 'selected';
                     }
                 },

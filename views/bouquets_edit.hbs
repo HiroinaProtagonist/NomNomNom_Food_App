@@ -108,7 +108,7 @@
 
             {{! DELETE form }}
             <form class='cuForm' id='delete_bouquet_flower_form' METHOD='POST' action='/bouquet_flower_delete'>
-                <!-- Variable access outside parent scope referenced from -->
+                <!-- Citation - Variable access outside parent scope referenced from -->
                 <!-- source url: https://stackoverflow.com/a/13645315/11312977 -->
                 <input type='hidden' name='bouquet_id' value='{{../data.bouquet_id}}'/>
                 <input type='hidden' name='flower_id' value='{{this.FLOWER_ID}}'/>
