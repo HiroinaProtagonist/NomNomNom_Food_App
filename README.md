@@ -5,6 +5,20 @@ I was previously working with a different group.
 I have adapted the previous collaborative work with permission from the instructor.
 All previous work is included in the git history, which has diverged from the previous project.
 
+##### Citations
+All work is based on citations as indicated in the code including
+PL/SQL assignment starter code, Web Application Technology exploration,
+Implementing CUD Operations in Your App examples, and Step 4 Draft starter code
+(https://canvas.oregonstate.edu/courses/2031764/assignments/10323329?module_item_id=26243433,
+https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419,
+https://canvas.oregonstate.edu/courses/2031764/pages/exploration-implementing-cud-operations-in-your-app?module_item_id=26243436
+https://canvas.oregonstate.edu/courses/2031764/assignments/10323339?module_item_id=26243440)
+
+Variable access outside parent scope in bouquets_edit.hbs referenced from https://stackoverflow.com/a/13645315/11312977
+Code to populate selected field in app.js adapted from https://www.npmjs.com/package/express-handlebars
+
+-- Citation for Flower Meanings: http://www.allflorists.co.uk/advice_flowerMeanings.asp
+
 ##### Dotenv/.env Setup
 This implementation is based on having used dotenv before,
 For reference purposes, see https://www.npmjs.com/package/dotenv
